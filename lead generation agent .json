@@ -1,0 +1,4281 @@
+{
+  "name": "lead generation agent",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.apify.com/v2/acts/compass~crawler-google-places/run-sync-get-dataset-items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"includeWebResults\": true,\n    \"language\": \"en\",\n    \"locationQuery\": \"{{ $json.data.Location }}\",\n    \"maxCrawledPlacesPerSearch\":{{ $json.data['Lead Number'] }} ,\n    \"maxImages\": 0,\n    \"maximumLeadsEnrichmentRecords\": 0,\n    \"scrapeContacts\": true,\n    \"scrapeDirectories\": true,\n    \"scrapeImageAuthors\": true,\n    \"scrapePlaceDetailPage\": true,\n    \"scrapeReviewsPersonalData\": true,\n    \"scrapeTableReservationProvider\": true,\n    \"searchStringsArray\": [\n        \"{{ $json.data['Business Type'] }}\"\n    ],\n    \"skipClosedPlaces\": true\n}",
+        "options": {}
+      },
+      "id": "f021e9ff-f5ee-417a-9a15-56248ec34edc",
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -3328,
+        2592
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "fqWTS3EIFUMGVVMW",
+          "name": "apifyKEY"
+        },
+        "httpQueryAuth": {
+          "id": "cTVrwkPcwgFWHAmy",
+          "name": "apifyKEY"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Business Data",
+        "height": 336,
+        "width": 752,
+        "color": 3
+      },
+      "id": "3abe0952-b67e-4fc3-91aa-471d08451cb0",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3648,
+        2496
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "text": "=Website: {{ $json.website }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Email Address",
+              "description": "=find out the best only one email address from the website after scraping the website. The mail address have to be in ideal format.",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9beed2e1-8e3d-4055-88b8-237d747ae366",
+      "name": "Information Extractor2",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "position": [
+        -3712,
+        2944
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "0906e21a-0958-433e-b400-8694915ef3c9",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.website }}",
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "fa34b96f-526e-4207-be6a-886de3ec5079",
+      "name": "Filter1",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        -3072,
+        2592
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1MKe3GejEGtKSO4QkfxEbpGsjQsDPFfmQjINtSYIrX60",
+          "mode": "list",
+          "cachedResultName": "Lead Generation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MKe3GejEGtKSO4QkfxEbpGsjQsDPFfmQjINtSYIrX60/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MKe3GejEGtKSO4QkfxEbpGsjQsDPFfmQjINtSYIrX60/edit#gid=0"
+        },
+        "columns": {
+          "value": {
+            "Address": "={{ $('Filter1').item.json.address }}",
+            "Website": "={{ $('Filter1').item.json.website }}",
+            "Category": "={{ $('Filter1').item.json.categoryName }}",
+            "Company Name": "={{ $('Filter1').item.json.title }}",
+            "Email Address": "={{ $json.output['Email Address'] }}",
+            "Phone Nummber": "={{ $('Filter1').item.json.phoneUnformatted }}"
+          },
+          "schema": [
+            {
+              "id": "Company Name",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Company Name",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "Category",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Website",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone Nummber",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Phone Nummber",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Address",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Email Address",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Address",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Address",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cold Mail Status",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Cold Mail Status",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SEND Time",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "SEND Time",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "94178a9e-932f-4ca0-aca1-34a5e419326c",
+      "name": "Append row in sheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        -3008,
+        2928
+      ],
+      "typeVersion": 4.6,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BQxdMw9lmTS7j3AQ",
+          "name": "Google Sheets account (smplics)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "0601f2d2-2522-471e-9e11-29498a47e19a",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              },
+              "leftValue": "={{ $json.output['Email Address'] }}",
+              "rightValue": "@"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "970767f0-a99f-414f-96ae-5f16f249a879",
+      "name": "If1",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -3296,
+        2944
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {},
+      "id": "e70eb2e5-da12-4399-b160-109be870fa01",
+      "name": "No Operation, do nothing1",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        -3008,
+        3104
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "# Getting the Email Address",
+        "height": 368,
+        "width": 1136,
+        "color": 4
+      },
+      "id": "98b163c3-bcda-4daa-89dc-22843ff47e66",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3840,
+        2864
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json['Email Address'] }}",
+        "subject": "={{ $('Information Extractor3').item.json.output['Mail Subject'] }}",
+        "emailType": "text",
+        "message": "={{ $('Information Extractor3').item.json.output['Mail Body'] }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "40412a6d-c7f7-4bcd-8298-82a0a549c5d7",
+      "name": "Send a message1",
+      "type": "n8n-nodes-base.gmail",
+      "maxTries": 2,
+      "position": [
+        -2448,
+        3360
+      ],
+      "webhookId": "9ce15ceb-1aeb-4dd7-b269-f981f431c05f",
+      "executeOnce": false,
+      "retryOnFail": false,
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bYScxW4sAhhQy2Zz",
+          "name": "mohammedCredentials"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "text": "=You are a perfect cold mail generator for a Digital Marketing Agency named Upward Engine.\n\nHere's the Information about the Recipient:\n\nCompany Name: {{ $('Loop Over Items1').item.json['Company Name'] }}\nBusiness Type: {{ $('Loop Over Items1').item.json.Category }}\n\nEmail Style / Email Tune : {{ $('Send message and wait for response1').item.json.data['Email Style'] }}\n\nThe Email style is given just to understand how the mail will be.\n\nInstructions:\n\n1. Always start with giving a greting to the Company like Hi Company Name,\n2. Always use We not I.\n3. Mail have to be professional, Clean and to the point\n4. At last give a Signeture Like:\n   [Your Name]\n  [Your Company/Agency Name]",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "Mail Subject",
+              "description": "Eye catchy mail Subject for the cold mail",
+              "required": true
+            },
+            {
+              "name": "Mail Body",
+              "description": "=body message of the mail, a perfect and clear cold mail.",
+              "required": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c127fdf8-e769-47b3-bcb9-f1b610c8f260",
+      "name": "Information Extractor3",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "position": [
+        -3296,
+        3360
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "id": "ed0b9361-80d6-4a33-8732-2adab5f4a2a6",
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -3312,
+        3648
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "d50Tbh0XGJWC5Bbv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1MKe3GejEGtKSO4QkfxEbpGsjQsDPFfmQjINtSYIrX60",
+          "mode": "list",
+          "cachedResultName": "Lead Generation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MKe3GejEGtKSO4QkfxEbpGsjQsDPFfmQjINtSYIrX60/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MKe3GejEGtKSO4QkfxEbpGsjQsDPFfmQjINtSYIrX60/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "SEND Time": "={{ $('Edit Fields').item.json['Send Time'] }}",
+            "Cold Mail Status": "✅",
+            "Email Address": "={{ $('Edit Fields').item.json['Email Address'] }}"
+          },
+          "matchingColumns": [
+            "Email Address"
+          ],
+          "schema": [
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone Nummber",
+              "displayName": "Phone Nummber",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Address",
+              "displayName": "Email Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cold Mail Status",
+              "displayName": "Cold Mail Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SEND Time",
+              "displayName": "SEND Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "4412b363-8e7d-4cf3-b13b-ff28425ef2bb",
+      "name": "Append or update row in sheet1",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        -2192,
+        3360
+      ],
+      "typeVersion": 4.6,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BQxdMw9lmTS7j3AQ",
+          "name": "Google Sheets account (smplics)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Email Send",
+        "height": 448,
+        "width": 2096,
+        "color": 5
+      },
+      "id": "ee933755-5327-44ec-b958-f9094f1a2c92",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4304,
+        3264
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ab73a5e-6659-4615-9f03-a1b3dacaa42e",
+              "name": "Send Time",
+              "type": "string",
+              "value": "={{$now.toFormat(\"MM-dd-yyyy (h:mm a)\")}}"
+            },
+            {
+              "id": "a102af99-f990-4f54-aa19-96a4c8002a9b",
+              "name": "Email Address",
+              "type": "string",
+              "value": "={{ $('Wait1').item.json['Email Address'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4b80dbad-bdbb-4e9c-bd1e-b0a478de4055",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -2672,
+        3360
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "9be4f7f2-5bae-4f2c-98c8-d3972081e7b7",
+      "name": "Loop Over Items1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        -4048,
+        3344
+      ],
+      "notesInFlow": false,
+      "typeVersion": 3,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "id": "1647fc0f-964c-4a12-8844-1551f9e6ba32",
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        -3760,
+        3568
+      ],
+      "webhookId": "a8a457d5-f88d-451c-ac51-1af17c8435b0",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "id": "492cabc1-ddb6-4183-9679-c4dee2c803ff",
+      "name": "OpenAI Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -3712,
+        3152
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "d50Tbh0XGJWC5Bbv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3776,
+        2592
+      ],
+      "id": "18d6214a-d0f2-4880-a098-ab642304d615",
+      "name": "Telegram Trigger1",
+      "webhookId": "8d82fa4b-ddb0-433a-a75a-fca7b8351700",
+      "credentials": {
+        "telegramApi": {
+          "id": "G5ftDp7hs5rGlFn1",
+          "name": "Leadbot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $json.message.chat.id }}",
+        "message": "📢 Lead Generation Request 🚀  ",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Business Type",
+              "placeholder": "e.g. Plumber",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Location",
+              "placeholder": "e.g. Rome, Italy",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Lead Number",
+              "fieldType": "number",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email Style",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Friendly"
+                  },
+                  {
+                    "option": "Professional"
+                  },
+                  {
+                    "option": "Simple"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -3568,
+        2592
+      ],
+      "id": "837f738b-bb7d-4e88-826d-e62f1b18d1fa",
+      "name": "Send message and wait for response1",
+      "webhookId": "21e2ef14-8708-4227-80e3-27fa4c12dba0",
+      "credentials": {
+        "telegramApi": {
+          "id": "G5ftDp7hs5rGlFn1",
+          "name": "Leadbot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger1').item.json.message.chat.id }}",
+        "text": "=📧 Email to {{ $('Append row in sheet1').item.json['Company Name'] }} was sent successfully 🎉\n\n🏢 Company Name: {{ $('Append row in sheet1').item.json['Company Name'] }}\n📂 Category: {{ $('Append row in sheet1').item.json.Category }}\n🌐 Website: {{ $('Append row in sheet1').item.json.Website }}\n📞 Phone Number: {{ $('Append row in sheet1').item.json['Phone Nummber'] }}\n📍 Address: {{ $('Append row in sheet1').item.json.Address }}\n✉️ Email: {{ $json['Email Address'] }}\n",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -3760,
+        3264
+      ],
+      "id": "88a05c24-3331-4d1c-9766-47d56433c967",
+      "name": "Send a text message2",
+      "webhookId": "7914996d-d082-42e0-bc69-7445869db1e6",
+      "credentials": {
+        "telegramApi": {
+          "id": "G5ftDp7hs5rGlFn1",
+          "name": "Leadbot"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "HTTP Request1": [
+      {
+        "json": {
+          "title": "F45 Training The Pearl",
+          "price": null,
+          "categoryName": "Gym",
+          "address": "Doha Marina, Twenty Four Porto Arabia, Porto Arabia Dravia 24 Marina, Doha, Qatar",
+          "neighborhood": "The Pearl-Qatar",
+          "street": "Doha Marina, Twenty Four Porto Arabia, Porto Arabia Dravia 24 Marina",
+          "city": "Doha",
+          "postalCode": null,
+          "state": null,
+          "countryCode": "QA",
+          "website": "https://f45training.com/qa/studio/thepearl/",
+          "phone": "+974 7068 9391",
+          "phoneUnformatted": "+97470689391",
+          "claimThisBusiness": false,
+          "location": {
+            "lat": 25.3671826,
+            "lng": 51.5479005
+          },
+          "totalScore": 4.6,
+          "permanentlyClosed": false,
+          "temporarilyClosed": false,
+          "placeId": "ChIJobiIATnDRT4RckSbnlhnUsA",
+          "categories": [
+            "Gym",
+            "Fitness center",
+            "Training center"
+          ],
+          "fid": "0x3e45c3390188b8a1:0xc05267589e9b4472",
+          "cid": "13858252633688196210",
+          "reviewsCount": 84,
+          "imagesCount": 66,
+          "imageCategories": [
+            "All",
+            "Gym",
+            "Videos",
+            "By owner"
+          ],
+          "scrapedAt": "2025-11-24T10:32:05.429Z",
+          "googleFoodUrl": null,
+          "hotelAds": [],
+          "openingHours": [
+            {
+              "day": "Monday",
+              "hours": "5:30 AM to 8:30 PM"
+            },
+            {
+              "day": "Tuesday",
+              "hours": "5:30 AM to 8:30 PM"
+            },
+            {
+              "day": "Wednesday",
+              "hours": "5:30 AM to 8:30 PM"
+            },
+            {
+              "day": "Thursday",
+              "hours": "5:30 AM to 8:30 PM"
+            },
+            {
+              "day": "Friday",
+              "hours": "6:45 AM to 2 PM"
+            },
+            {
+              "day": "Saturday",
+              "hours": "6:45 AM to 2 PM"
+            },
+            {
+              "day": "Sunday",
+              "hours": "5:30 AM to 8:30 PM"
+            }
+          ],
+          "peopleAlsoSearch": [
+            {
+              "category": "People also search for",
+              "title": "DYNAMIK GYM- the pearl",
+              "reviewsCount": 76,
+              "totalScore": 4.3
+            },
+            {
+              "category": "People also search for",
+              "title": "Fitness Factory",
+              "reviewsCount": 6,
+              "totalScore": 4.3
+            },
+            {
+              "category": "People also search for",
+              "title": "CrossFit T23 Qatar",
+              "reviewsCount": 87,
+              "totalScore": 4.5
+            },
+            {
+              "category": "People also search for",
+              "title": "Orangetheory Fitness The Pearl",
+              "reviewsCount": 107,
+              "totalScore": 4.6
+            },
+            {
+              "category": "People also search for",
+              "title": "UFC Gym – Pearl Qatar | MMA, BJJ, Boxing & Fitness",
+              "reviewsCount": 216,
+              "totalScore": 4.5
+            }
+          ],
+          "placesTags": [],
+          "reviewsTags": [
+            {
+              "title": "motivation",
+              "count": 6
+            },
+            {
+              "title": "smoothie",
+              "count": 2
+            },
+            {
+              "title": "trainers",
+              "count": 2
+            }
+          ],
+          "additionalInfo": {
+            "Accessibility": [
+              {
+                "Wheelchair accessible parking lot": true
+              },
+              {
+                "Wheelchair accessible entrance": false
+              }
+            ],
+            "Amenities": [
+              {
+                "Restroom": true
+              }
+            ],
+            "Payments": [
+              {
+                "Credit cards": true
+              },
+              {
+                "Debit cards": true
+              },
+              {
+                "NFC mobile payments": true
+              }
+            ]
+          },
+          "gasPrices": [],
+          "url": "https://www.google.com/maps/search/?api=1&query=F45%20Training%20The%20Pearl&query_place_id=ChIJobiIATnDRT4RckSbnlhnUsA",
+          "searchPageUrl": "https://www.google.com/maps/search/Gyms/@25.37642255,51.549729150000005,17z?hl=en",
+          "searchString": "Gyms",
+          "language": "en",
+          "rank": 7,
+          "isAdvertisement": false,
+          "imageUrl": "https://lh3.googleusercontent.com/p/AF1QipNrgoou5yIUxA0PQu31wMtfwYv2LNmXLJwRFBkP=w426-h240-k-no",
+          "kgmid": "/g/11c1nf9h66",
+          "subTitle": null,
+          "description": null,
+          "locatedIn": null,
+          "plusCode": "9G8X+V5 Doha, Qatar",
+          "menu": null,
+          "reviewsDistribution": {
+            "oneStar": 3,
+            "twoStar": 1,
+            "threeStar": 4,
+            "fourStar": 12,
+            "fiveStar": 64
+          },
+          "reserveTableUrl": null,
+          "hotelStars": null,
+          "hotelDescription": null,
+          "checkInDate": null,
+          "checkOutDate": null,
+          "similarHotelsNearby": null,
+          "hotelReviewSummary": null,
+          "popularTimesLiveText": "Not busy",
+          "popularTimesLivePercent": 0,
+          "popularTimesHistogram": {
+            "Su": [
+              {
+                "hour": 4,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 5,
+                "occupancyPercent": 30
+              },
+              {
+                "hour": 6,
+                "occupancyPercent": 37
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 41
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 32
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 30
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 26
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 28
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 28
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 26
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 39
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 60
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 88
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 100
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 84
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 58
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 35
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              }
+            ],
+            "Mo": [
+              {
+                "hour": 4,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 5,
+                "occupancyPercent": 37
+              },
+              {
+                "hour": 6,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 64
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 47
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 32
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 26
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 16
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 16
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 18
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 33
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 41
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 64
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 67
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 69
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 62
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              }
+            ],
+            "Tu": [
+              {
+                "hour": 4,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 5,
+                "occupancyPercent": 52
+              },
+              {
+                "hour": 6,
+                "occupancyPercent": 56
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 54
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 45
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 37
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 24
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 22
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 24
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 26
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 30
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 33
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 47
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 67
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 71
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 73
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 62
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              }
+            ],
+            "We": [
+              {
+                "hour": 4,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 5,
+                "occupancyPercent": 41
+              },
+              {
+                "hour": 6,
+                "occupancyPercent": 54
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 49
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 43
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 37
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 24
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 20
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 24
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 28
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 30
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 39
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 54
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 64
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 71
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 66
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 49
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              }
+            ],
+            "Th": [
+              {
+                "hour": 4,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 5,
+                "occupancyPercent": 41
+              },
+              {
+                "hour": 6,
+                "occupancyPercent": 52
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 45
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 43
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 32
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 28
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 22
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 22
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 26
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 39
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 58
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 69
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 73
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 62
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 47
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 33
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              }
+            ],
+            "Fr": [
+              {
+                "hour": 5,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 6,
+                "occupancyPercent": 16
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 24
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 39
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 62
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 69
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 56
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 43
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 30
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 0
+              }
+            ],
+            "Sa": [
+              {
+                "hour": 5,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 6,
+                "occupancyPercent": 20
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 28
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 39
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 39
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 52
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 39
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 22
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 0
+              }
+            ]
+          },
+          "additionalOpeningHours": null,
+          "openingHoursBusinessConfirmationText": null,
+          "questionsAndAnswers": [],
+          "updatesFromCustomers": null,
+          "inputPlaceId": null,
+          "userPlaceNote": null,
+          "webResults": [
+            {
+              "title": "F45 Training The Pearl | Team Training | Sign Up Today",
+              "displayedUrl": "https://f45training.com › studio › thepearl",
+              "url": "https://f45training.com/qa/studio/thepearl/",
+              "description": "F45 TRAINING THE PEARL offers functional group fitness classes, reimagined. We are more than just a gym."
+            },
+            {
+              "title": "F45 Training The Pearl - Qatar (@f45_training_thepearl)",
+              "displayedUrl": "https://www.instagram.com › f45_training_thepearl",
+              "url": "https://www.instagram.com/f45_training_thepearl/?hl\\u003den",
+              "description": "Next to Tower 24, Porto Arabia Functional HIIT Group Training 7068 9391 ⬇️Download F45 Qatar App | Book your class⬇️ ..."
+            },
+            {
+              "title": "Your First Day At F45 Pearl District - F45 Training",
+              "displayedUrl": "https://f45training.com › studio › new-to-f45",
+              "url": "https://f45training.com/studio/pearldistrict/new-to-f45/",
+              "description": "Eager to sweat it out at F45 Training Pearl District? Find a breakdown of what to expect on your first day of cardio and resistance training at our studio."
+            }
+          ],
+          "tableReservationLinks": [],
+          "bookingLinks": [],
+          "orderBy": [],
+          "restaurantData": {
+            "tableReservationProvider": null
+          },
+          "ownerUpdates": [],
+          "domain": "f45training.com",
+          "scrapedUrls": [
+            "https://f45training.com/qa/studio/thepearl/",
+            "https://f45training.com/qa/workouts/resistance/",
+            "https://f45training.com/qa/workouts/cardio/",
+            "https://f45training.com/qa/workouts/",
+            "https://f45training.com/qa/workouts/hybrid/"
+          ],
+          "emails": [],
+          "phones": [
+            "+974 7068 9391"
+          ],
+          "phonesUncertain": [
+            "+974 7068 9391"
+          ],
+          "linkedIns": [
+            "https://www.linkedin.com/company/f45-training"
+          ],
+          "twitters": [
+            "https://twitter.com/F45TRAINING"
+          ],
+          "instagrams": [
+            "https://www.instagram.com/f45_training_thepearl",
+            "https://instagram.com/f45_training"
+          ],
+          "facebooks": [
+            "https://www.facebook.com/f45thepearl",
+            "https://www.facebook.com/F45FunctionalTraining"
+          ],
+          "youtubes": [
+            "https://www.youtube.com/user/F45Training"
+          ],
+          "tiktoks": [
+            "https://www.tiktok.com/@f45_training"
+          ],
+          "pinterests": [],
+          "discords": [],
+          "snapchats": [],
+          "threads": [
+            "https://www.threads.net/@f45_training"
+          ],
+          "telegrams": [],
+          "reddits": [],
+          "whatsapps": [],
+          "imageUrls": [],
+          "images": [],
+          "reviews": [],
+          "leadsEnrichment": []
+        }
+      },
+      {
+        "json": {
+          "title": "Barre Studio",
+          "price": null,
+          "categoryName": "Pilates studio",
+          "address": "9GGW+M3M, Doha, Qatar",
+          "neighborhood": "The Pearl-Qatar",
+          "street": "9GGW+M3M",
+          "city": "Doha",
+          "postalCode": null,
+          "state": null,
+          "countryCode": "QA",
+          "phone": "+974 5504 2081",
+          "phoneUnformatted": "+97455042081",
+          "claimThisBusiness": true,
+          "location": {
+            "lat": 25.3767152,
+            "lng": 51.5451613
+          },
+          "totalScore": 3.5,
+          "permanentlyClosed": false,
+          "temporarilyClosed": false,
+          "placeId": "ChIJb8QJbwDDRT4R9lGOk7m80sU",
+          "categories": [
+            "Pilates studio"
+          ],
+          "fid": "0x3e45c3006f09c46f:0xc5d2bcb9938e51f6",
+          "cid": "14254663275811590646",
+          "reviewsCount": 4,
+          "imagesCount": null,
+          "imageCategories": [],
+          "scrapedAt": "2025-11-24T10:32:08.136Z",
+          "googleFoodUrl": null,
+          "hotelAds": [],
+          "openingHours": [],
+          "peopleAlsoSearch": [
+            {
+              "category": "People also search for",
+              "title": "BE Pilates",
+              "reviewsCount": 36,
+              "totalScore": 4.6
+            },
+            {
+              "category": "People also search for",
+              "title": "Riaya",
+              "reviewsCount": 14,
+              "totalScore": 4.3
+            },
+            {
+              "category": "People also search for",
+              "title": "Raise The Barre",
+              "reviewsCount": 0,
+              "totalScore": 0
+            },
+            {
+              "category": "People also search for",
+              "title": "SCULPT Pilates Club",
+              "reviewsCount": 16,
+              "totalScore": 4.8
+            },
+            {
+              "category": "People also search for",
+              "title": "Pilates with Anastasiia",
+              "reviewsCount": 10,
+              "totalScore": 5
+            }
+          ],
+          "placesTags": [],
+          "reviewsTags": [
+            {
+              "title": "location",
+              "count": 2
+            }
+          ],
+          "additionalInfo": {
+            "Amenities": [
+              {
+                "Restroom": true
+              }
+            ]
+          },
+          "gasPrices": [],
+          "url": "https://www.google.com/maps/search/?api=1&query=Barre%20Studio&query_place_id=ChIJb8QJbwDDRT4R9lGOk7m80sU",
+          "searchPageUrl": "https://www.google.com/maps/search/Gyms/@25.37642255,51.549729150000005,17z?hl=en",
+          "searchString": "Gyms",
+          "language": "en",
+          "rank": 6,
+          "isAdvertisement": false,
+          "kgmid": "/g/11wmxdcqyt",
+          "subTitle": null,
+          "description": null,
+          "website": null,
+          "locatedIn": null,
+          "plusCode": null,
+          "menu": null,
+          "reviewsDistribution": {
+            "oneStar": 1,
+            "twoStar": 0,
+            "threeStar": 1,
+            "fourStar": 0,
+            "fiveStar": 2
+          },
+          "reserveTableUrl": null,
+          "hotelStars": null,
+          "hotelDescription": null,
+          "checkInDate": null,
+          "checkOutDate": null,
+          "similarHotelsNearby": null,
+          "hotelReviewSummary": null,
+          "additionalOpeningHours": null,
+          "openingHoursBusinessConfirmationText": null,
+          "questionsAndAnswers": [],
+          "updatesFromCustomers": null,
+          "inputPlaceId": null,
+          "imageUrl": null,
+          "userPlaceNote": null,
+          "webResults": [
+            {
+              "title": "Barre Studio (@barrestudio.qa) • Instagram photos and videos",
+              "displayedUrl": "https://www.instagram.com › barrestudio",
+              "url": "https://www.instagram.com/barrestudio.qa/?hl\\u003den",
+              "description": "From the Barre Studio team - “to the heart of this studio: our ... Barre x Strength = unstoppable  ⚡️ #barre #barrestrength #pilates #doha #qatar #thepearl ..."
+            },
+            {
+              "title": "Best Barre Studios in Doha - ClassPass",
+              "displayedUrl": "https://classpass.com › search › doha › barre",
+              "url": "https://classpass.com/search/doha/barre",
+              "description": "Barry's. Barre, Strength Training, … Barry's. 860، West Bay, 63 Al Shatt St, Second Floor, Doha · FS8. Barre, Pilates, … FS8 · Motion Studio by Recovery Lab."
+            },
+            {
+              "title": "Raise The Barre - OX Fitness Lab",
+              "displayedUrl": "https://www.oxfitnesslab.com › raise-the-barre",
+              "url": "https://www.oxfitnesslab.com/raise-the-barre",
+              "description": "Doha's premier ladies-only barre studio located in the heart of West Bay at The Gate Mall. Sculpt, tone & strengthen through empowering, ballet-inspired ..."
+            }
+          ],
+          "tableReservationLinks": [],
+          "bookingLinks": [],
+          "orderBy": [],
+          "restaurantData": {
+            "tableReservationProvider": null
+          },
+          "ownerUpdates": [],
+          "emails": [],
+          "phones": [],
+          "phonesUncertain": [],
+          "linkedIns": [],
+          "twitters": [],
+          "instagrams": [],
+          "facebooks": [],
+          "youtubes": [],
+          "tiktoks": [],
+          "pinterests": [],
+          "discords": [],
+          "imageUrls": [],
+          "images": [],
+          "reviews": [],
+          "leadsEnrichment": []
+        }
+      },
+      {
+        "json": {
+          "title": "Fitness Factory",
+          "price": null,
+          "categoryName": "Fitness center",
+          "address": "Marina Way 20, Doha, Qatar",
+          "neighborhood": "The Pearl-Qatar",
+          "street": "Marina Way 20",
+          "city": "Doha",
+          "postalCode": null,
+          "state": null,
+          "countryCode": "QA",
+          "website": "http://fitnessfactory.qa/",
+          "phone": "+974 5514 9404",
+          "phoneUnformatted": "+97455149404",
+          "claimThisBusiness": false,
+          "location": {
+            "lat": 25.3700606,
+            "lng": 51.5490587
+          },
+          "totalScore": 4.3,
+          "permanentlyClosed": false,
+          "temporarilyClosed": false,
+          "placeId": "ChIJswp_wADbRT4RfX9Exp2dMXg",
+          "categories": [
+            "Fitness center"
+          ],
+          "fid": "0x3e45db00c07f0ab3:0x78319d9dc6447f7d",
+          "cid": "8660876859371978621",
+          "reviewsCount": 6,
+          "imagesCount": 12,
+          "imageCategories": [
+            "All",
+            "By owner",
+            "Street View & 360°"
+          ],
+          "scrapedAt": "2025-11-24T10:32:11.135Z",
+          "googleFoodUrl": null,
+          "hotelAds": [],
+          "openingHours": [
+            {
+              "day": "Monday",
+              "hours": "8 AM to 8 PM"
+            },
+            {
+              "day": "Tuesday",
+              "hours": "8 AM to 8 PM"
+            },
+            {
+              "day": "Wednesday",
+              "hours": "8 AM to 8 PM"
+            },
+            {
+              "day": "Thursday",
+              "hours": "8 AM to 8 PM"
+            },
+            {
+              "day": "Friday",
+              "hours": "8 AM to 8 PM"
+            },
+            {
+              "day": "Saturday",
+              "hours": "8 AM to 8 PM"
+            },
+            {
+              "day": "Sunday",
+              "hours": "8 AM to 8 PM"
+            }
+          ],
+          "peopleAlsoSearch": [
+            {
+              "category": "People also search for",
+              "title": "Gymmito Fitness Club, The Pearl",
+              "reviewsCount": 17,
+              "totalScore": 5
+            },
+            {
+              "category": "People also search for",
+              "title": "F45 Training The Pearl",
+              "reviewsCount": 84,
+              "totalScore": 4.6
+            },
+            {
+              "category": "People also search for",
+              "title": "DYNAMIK GYM- the pearl",
+              "reviewsCount": 76,
+              "totalScore": 4.3
+            },
+            {
+              "category": "People also search for",
+              "title": "BE Pilates",
+              "reviewsCount": 36,
+              "totalScore": 4.6
+            },
+            {
+              "category": "People also search for",
+              "title": "Fitness First City Center Doha",
+              "reviewsCount": 443,
+              "totalScore": 3.9
+            }
+          ],
+          "placesTags": [],
+          "reviewsTags": [
+            {
+              "title": "adults",
+              "count": 2
+            }
+          ],
+          "additionalInfo": {
+            "Service options": [
+              {
+                "Onsite services": true
+              },
+              {
+                "Online classes": false
+              }
+            ],
+            "Amenities": [
+              {
+                "Restroom": true
+              }
+            ],
+            "Payments": [
+              {
+                "Credit cards": true
+              },
+              {
+                "Debit cards": true
+              },
+              {
+                "NFC mobile payments": true
+              }
+            ],
+            "Children": [
+              {
+                "Good for kids": true
+              }
+            ]
+          },
+          "gasPrices": [],
+          "url": "https://www.google.com/maps/search/?api=1&query=Fitness%20Factory&query_place_id=ChIJswp_wADbRT4RfX9Exp2dMXg",
+          "searchPageUrl": "https://www.google.com/maps/search/Gyms/@25.37642255,51.549729150000005,17z?hl=en",
+          "searchString": "Gyms",
+          "language": "en",
+          "rank": 4,
+          "isAdvertisement": false,
+          "imageUrl": "https://lh3.googleusercontent.com/p/AF1QipMAQys7neLQ5F87SQ_rZxrIBuajOZx_vmtcdy7t=w408-h306-k-no",
+          "kgmid": "/g/11q8s23qxj",
+          "subTitle": null,
+          "description": null,
+          "locatedIn": null,
+          "plusCode": "9GCX+2J Doha, Qatar",
+          "menu": null,
+          "reviewsDistribution": {
+            "oneStar": 1,
+            "twoStar": 0,
+            "threeStar": 0,
+            "fourStar": 0,
+            "fiveStar": 5
+          },
+          "reserveTableUrl": null,
+          "hotelStars": null,
+          "hotelDescription": null,
+          "checkInDate": null,
+          "checkOutDate": null,
+          "similarHotelsNearby": null,
+          "hotelReviewSummary": null,
+          "popularTimesLiveText": "Now: Usually a little busy",
+          "popularTimesLivePercent": null,
+          "popularTimesHistogram": {
+            "Su": [
+              {
+                "hour": 6,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 16
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 22
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 27
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 27
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 38
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 44
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 33
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 27
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 27
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 27
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 27
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 27
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 23,
+                "occupancyPercent": 0
+              }
+            ],
+            "Mo": [
+              {
+                "hour": 6,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 44
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 38
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 38
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 33
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 33
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 55
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 38
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 22
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 22
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 16
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 11
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 22
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 23,
+                "occupancyPercent": 0
+              }
+            ],
+            "Tu": [
+              {
+                "hour": 6,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 22
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 27
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 27
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 55
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 55
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 55
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 55
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 27
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 27
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 44
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 33
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 27
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 23,
+                "occupancyPercent": 0
+              }
+            ],
+            "We": [
+              {
+                "hour": 6,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 38
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 38
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 61
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 83
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 88
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 100
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 83
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 61
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 33
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 22
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 23,
+                "occupancyPercent": 0
+              }
+            ],
+            "Th": [
+              {
+                "hour": 6,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 61
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 22
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 11
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 16
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 11
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 16
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 16
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 16
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 16
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 22
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 16
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 22
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 23,
+                "occupancyPercent": 0
+              }
+            ],
+            "Fr": [
+              {
+                "hour": 6,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 22
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 66
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 72
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 61
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 66
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 55
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 66
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 44
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 27
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 11
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 5
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 23,
+                "occupancyPercent": 0
+              }
+            ],
+            "Sa": [
+              {
+                "hour": 6,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 27
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 38
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 38
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 55
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 44
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 33
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 22
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 11
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 22
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 27
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 23,
+                "occupancyPercent": 0
+              }
+            ]
+          },
+          "additionalOpeningHours": null,
+          "openingHoursBusinessConfirmationText": null,
+          "questionsAndAnswers": [],
+          "updatesFromCustomers": null,
+          "inputPlaceId": null,
+          "userPlaceNote": null,
+          "webResults": [
+            {
+              "title": "Fitness Factory – The Healthy Way of Life!",
+              "displayedUrl": "https://fitnessfactory.qa",
+              "url": "https://fitnessfactory.qa/",
+              "description": "Our Youth Academies ... FIG Gymnastics ... RAD Ballet classes for youth. Ballet / Dance ... CLRG Irish Dance ... Generation Pound ... Kickboxing ... Aikido ... Taekwando."
+            },
+            {
+              "title": "Fitness Factory (@fitnessfactory.qa) - Instagram",
+              "displayedUrl": "https://www.instagram.com › fitnessfactory",
+              "url": "https://www.instagram.com/fitnessfactory.qa/?hl\\u003den",
+              "description": "Taekwondo Kids Classes – Coach Wissam is Back! · Be Better. · Kids Yoga Adventure! · WARRIOR Rhythm – Yoga-ish Class Ladies, it's here in Qatar! · Kids Karate at ..."
+            },
+            {
+              "title": "About - Fitness Factory",
+              "displayedUrl": "https://fitnessfactory.qa › about",
+              "url": "https://fitnessfactory.qa/about/",
+              "description": "Fitness Factory founded in 2020 under the umbrella of Regency Group Holdings. We are the new branding resulting from a merger of the leading provider of ..."
+            }
+          ],
+          "tableReservationLinks": [],
+          "bookingLinks": [],
+          "orderBy": [],
+          "restaurantData": {
+            "tableReservationProvider": null
+          },
+          "ownerUpdates": [],
+          "domain": "fitnessfactory.qa",
+          "scrapedUrls": [
+            "https://fitnessfactory.qa/",
+            "https://fitnessfactory.qa/",
+            "https://fitnessfactory.qa/contact/",
+            "https://fitnessfactory.qa/about/",
+            "https://fitnessfactory.qa/careers/"
+          ],
+          "emails": [
+            "info@fitnessfactory.qa"
+          ],
+          "phones": [],
+          "phonesUncertain": [
+            "+974 5514"
+          ],
+          "linkedIns": [],
+          "twitters": [],
+          "instagrams": [
+            "https://www.instagram.com/fitnessfactory.qa"
+          ],
+          "facebooks": [
+            "https://www.facebook.com/fitnessfactory.qa"
+          ],
+          "youtubes": [],
+          "tiktoks": [],
+          "pinterests": [],
+          "discords": [],
+          "snapchats": [],
+          "threads": [],
+          "telegrams": [],
+          "reddits": [],
+          "whatsapps": [],
+          "imageUrls": [],
+          "images": [],
+          "reviews": [],
+          "leadsEnrichment": []
+        }
+      },
+      {
+        "json": {
+          "title": "DYNAMIK GYM- the pearl",
+          "subTitle": "ديناميك جيم - اللؤلؤة",
+          "price": null,
+          "categoryName": "Gym",
+          "address": "Tower 29, Parcel, Doha, Qatar",
+          "neighborhood": "The Pearl-Qatar",
+          "street": "Tower 29, Parcel",
+          "city": "Doha",
+          "postalCode": null,
+          "state": null,
+          "countryCode": "QA",
+          "website": "http://www.dynamikqa.com/",
+          "phone": "+974 4444 3381",
+          "phoneUnformatted": "+97444443381",
+          "claimThisBusiness": false,
+          "location": {
+            "lat": 25.3658771,
+            "lng": 51.5452953
+          },
+          "totalScore": 4.3,
+          "permanentlyClosed": false,
+          "temporarilyClosed": false,
+          "placeId": "ChIJY8iccW3DRT4RuCe7Tbf-_IY",
+          "categories": [
+            "Gym"
+          ],
+          "fid": "0x3e45c36d719cc863:0x86fcfeb74dbb27b8",
+          "cid": "9726929358450010040",
+          "reviewsCount": 76,
+          "imagesCount": 92,
+          "imageCategories": [
+            "All",
+            "Gym",
+            "Videos",
+            "By owner"
+          ],
+          "scrapedAt": "2025-11-24T10:32:14.113Z",
+          "googleFoodUrl": null,
+          "hotelAds": [],
+          "openingHours": [
+            {
+              "day": "Monday",
+              "hours": "6:30 AM to 12 AM"
+            },
+            {
+              "day": "Tuesday",
+              "hours": "6:30 AM to 12 AM"
+            },
+            {
+              "day": "Wednesday",
+              "hours": "6:30 AM to 12 AM"
+            },
+            {
+              "day": "Thursday",
+              "hours": "6:30 AM to 12 AM"
+            },
+            {
+              "day": "Friday",
+              "hours": "10 AM to 8 PM"
+            },
+            {
+              "day": "Saturday",
+              "hours": "6:30 AM to 12 AM"
+            },
+            {
+              "day": "Sunday",
+              "hours": "6:30 AM to 12 AM"
+            }
+          ],
+          "peopleAlsoSearch": [
+            {
+              "category": "People also search for",
+              "title": "F45 Training The Pearl",
+              "reviewsCount": 84,
+              "totalScore": 4.6
+            },
+            {
+              "category": "People also search for",
+              "title": "The Venue Ladies",
+              "reviewsCount": 110,
+              "totalScore": 3.9
+            },
+            {
+              "category": "People also search for",
+              "title": "Gymmito Fitness Club, The Pearl",
+              "reviewsCount": 17,
+              "totalScore": 5
+            },
+            {
+              "category": "People also search for",
+              "title": "Fitness Factory",
+              "reviewsCount": 6,
+              "totalScore": 4.3
+            },
+            {
+              "category": "People also search for",
+              "title": "UFC Gym – Pearl Qatar | MMA, BJJ, Boxing & Fitness",
+              "reviewsCount": 216,
+              "totalScore": 4.5
+            }
+          ],
+          "placesTags": [],
+          "reviewsTags": [
+            {
+              "title": "machines",
+              "count": 7
+            },
+            {
+              "title": "price",
+              "count": 4
+            },
+            {
+              "title": "train",
+              "count": 3
+            },
+            {
+              "title": "clean",
+              "count": 3
+            },
+            {
+              "title": "atmosphere",
+              "count": 2
+            },
+            {
+              "title": "male",
+              "count": 2
+            },
+            {
+              "title": "sauna",
+              "count": 2
+            },
+            {
+              "title": "space",
+              "count": 2
+            },
+            {
+              "title": "equipment",
+              "count": 2
+            }
+          ],
+          "additionalInfo": {
+            "Service options": [
+              {
+                "Outdoor services": true
+              },
+              {
+                "Onsite services": true
+              },
+              {
+                "Online classes": false
+              }
+            ],
+            "Accessibility": [
+              {
+                "Wheelchair accessible entrance": true
+              },
+              {
+                "Wheelchair accessible parking lot": true
+              }
+            ],
+            "Offerings": [
+              {
+                "Sauna": true
+              }
+            ],
+            "Amenities": [
+              {
+                "Restroom": true
+              },
+              {
+                "Wi-Fi": true
+              },
+              {
+                "Free Wi-Fi": true
+              }
+            ],
+            "Planning": [
+              {
+                "Membership required": true
+              }
+            ],
+            "Payments": [
+              {
+                "Credit cards": true
+              },
+              {
+                "Debit cards": true
+              },
+              {
+                "NFC mobile payments": true
+              }
+            ],
+            "Parking": [
+              {
+                "Free parking garage": true
+              },
+              {
+                "Free parking lot": true
+              }
+            ]
+          },
+          "gasPrices": [],
+          "url": "https://www.google.com/maps/search/?api=1&query=DYNAMIK%20GYM-%20the%20pearl&query_place_id=ChIJY8iccW3DRT4RuCe7Tbf-_IY",
+          "searchPageUrl": "https://www.google.com/maps/search/Gyms/@25.37642255,51.549729150000005,17z?hl=en",
+          "searchString": "Gyms",
+          "language": "en",
+          "rank": 5,
+          "isAdvertisement": false,
+          "imageUrl": "https://lh3.googleusercontent.com/p/AF1QipMShPfZcYP1XirEHltZ1HUeZkNnb6t8XLZSdMHd=w408-h544-k-no",
+          "kgmid": "/g/11gfl0dhkn",
+          "description": null,
+          "locatedIn": null,
+          "plusCode": "9G8W+94 Doha, Qatar",
+          "menu": null,
+          "reviewsDistribution": {
+            "oneStar": 6,
+            "twoStar": 1,
+            "threeStar": 5,
+            "fourStar": 13,
+            "fiveStar": 51
+          },
+          "reserveTableUrl": null,
+          "hotelStars": null,
+          "hotelDescription": null,
+          "checkInDate": null,
+          "checkOutDate": null,
+          "similarHotelsNearby": null,
+          "hotelReviewSummary": null,
+          "popularTimesLiveText": "Busier than usual",
+          "popularTimesLivePercent": 80,
+          "popularTimesHistogram": {
+            "Su": [
+              {
+                "hour": 5,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 6,
+                "occupancyPercent": 21
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 23
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 32
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 28
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 30
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 26
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 21
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 26
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 42
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 75
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 100
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 96
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 69
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 51
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 41
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 25
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 14
+              },
+              {
+                "hour": 23,
+                "occupancyPercent": 10
+              }
+            ],
+            "Mo": [
+              {
+                "hour": 5,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 6,
+                "occupancyPercent": 16
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 16
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 32
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 39
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 51
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 48
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 48
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 44
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 51
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 67
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 76
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 82
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 87
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 85
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 62
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 32
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 23
+              },
+              {
+                "hour": 23,
+                "occupancyPercent": 17
+              }
+            ],
+            "Tu": [
+              {
+                "hour": 5,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 6,
+                "occupancyPercent": 17
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 23
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 37
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 46
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 44
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 42
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 39
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 30
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 33
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 35
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 48
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 58
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 62
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 57
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 37
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 26
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 19
+              },
+              {
+                "hour": 23,
+                "occupancyPercent": 14
+              }
+            ],
+            "We": [
+              {
+                "hour": 5,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 6,
+                "occupancyPercent": 14
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 30
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 41
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 44
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 42
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 35
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 33
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 28
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 37
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 58
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 78
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 94
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 89
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 76
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 66
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 42
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 33
+              },
+              {
+                "hour": 23,
+                "occupancyPercent": 21
+              }
+            ],
+            "Th": [
+              {
+                "hour": 5,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 6,
+                "occupancyPercent": 21
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 33
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 41
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 48
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 39
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 33
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 28
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 33
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 46
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 62
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 67
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 53
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 42
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 32
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 28
+              },
+              {
+                "hour": 23,
+                "occupancyPercent": 19
+              }
+            ],
+            "Fr": [
+              {
+                "hour": 6,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 19
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 42
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 57
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 42
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 28
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 26
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 23
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 21
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 17
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 23,
+                "occupancyPercent": 0
+              }
+            ],
+            "Sa": [
+              {
+                "hour": 5,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 6,
+                "occupancyPercent": 14
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 30
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 51
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 66
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 82
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 85
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 76
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 60
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 62
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 64
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 57
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 48
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 41
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 30
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 17
+              },
+              {
+                "hour": 23,
+                "occupancyPercent": 8
+              }
+            ]
+          },
+          "additionalOpeningHours": null,
+          "openingHoursBusinessConfirmationText": null,
+          "questionsAndAnswers": [],
+          "updatesFromCustomers": {
+            "text": "الجهه المقابله",
+            "language": "ar",
+            "postDate": "a year ago",
+            "postedBy": {
+              "name": "Fuad Al dwairi",
+              "url": "https://www.google.com/maps/contrib/100229992109457927383?hl=en-US",
+              "title": "Local Guide",
+              "totalReviews": 472
+            },
+            "media": [
+              {
+                "link": "https://lh3.googleusercontent.com/geougc-cs/AMBA38sMzutxYsaunVEO95EpXPR9b33cekcblfHiMArOiU36azrwBha41zyyEei3cyR2gYFhf-vPQA4WZp_opM5mHyf4NUKW6VRDzVxh_w-MfTyMoU514azqqKqb8iQfD7cHuc7jEfQo",
+                "postDate": "a year ago"
+              },
+              {
+                "link": "https://lh3.googleusercontent.com/geougc-cs/AMBA38s4cqEKjRSJ9Qoj_c8p1j51ap_KE7a83mXQBIogMKqqmntJYlXv7UqJivu7wFsCrlP8Uu7z8P119VjIQyfeiyBNTQy4EmC0rHxPdwQVW5TPCGny3C11BY7rT--NcnxbGvIc4M_gpw",
+                "postDate": "a year ago"
+              }
+            ]
+          },
+          "inputPlaceId": null,
+          "userPlaceNote": null,
+          "webResults": [
+            {
+              "title": "DYNAMIK GYM (@dynamikqa) • Instagram photos and videos",
+              "displayedUrl": "https://www.instagram.com › dynamikqa",
+              "url": "https://www.instagram.com/dynamikqa/?hl\\u003den",
+              "description": "11K followers · 1K+ posts ‎· ‎اللؤلؤة The Pearl مفتوح طوال أيام الأسبوع Open 7 days a week -Men 6:30am to 12:00mn -Women's GYM 6:30 TO 10:00PM EVERY ..."
+            },
+            {
+              "title": "Dynamik QA | Doha - Facebook",
+              "displayedUrl": "https://www.facebook.com › DynamikQA",
+              "url": "https://www.facebook.com/DynamikQA/",
+              "description": "Dynamik is the hub for fitness lovers in Doha. Located at The Pearl we offer the latest in gym equipment, a wide range of classes, dedicated male and female ..."
+            },
+            {
+              "title": "Why Dynamik Gym should be your next workout destination",
+              "displayedUrl": "https://privilee.qa › insider › why-dynamik-gym-should...",
+              "url": "https://privilee.qa/insider/why-dynamik-gym-should-be-your-next-workout-destination",
+              "description": "Find Dynamik Gym The Pearl, Qatar. There are several things we can't help but ... To learn more about being a Privilee Member or our luxurious gyms in Doha, take ..."
+            }
+          ],
+          "tableReservationLinks": [],
+          "bookingLinks": [],
+          "orderBy": [],
+          "restaurantData": {
+            "tableReservationProvider": null
+          },
+          "ownerUpdates": [],
+          "domain": "dynamikqa.com",
+          "scrapedUrls": [
+            "http://www.dynamikqa.com/"
+          ],
+          "emails": [],
+          "phones": [],
+          "phonesUncertain": [],
+          "linkedIns": [],
+          "twitters": [],
+          "instagrams": [],
+          "facebooks": [],
+          "youtubes": [],
+          "tiktoks": [],
+          "pinterests": [],
+          "discords": [],
+          "snapchats": [],
+          "threads": [],
+          "telegrams": [],
+          "reddits": [],
+          "whatsapps": [],
+          "imageUrls": [],
+          "images": [],
+          "reviews": [],
+          "leadsEnrichment": []
+        }
+      },
+      {
+        "json": {
+          "title": "CrossFit T23 Qatar",
+          "price": null,
+          "categoryName": "Gym",
+          "address": "Porto Arabia 22 La Croisette, Doha, Qatar",
+          "neighborhood": "The Pearl-Qatar",
+          "street": "Porto Arabia 22 La Croisette",
+          "city": "Doha",
+          "postalCode": null,
+          "state": null,
+          "countryCode": "QA",
+          "website": "http://cft23.com/",
+          "phone": "+974 7701 6555",
+          "phoneUnformatted": "+97477016555",
+          "claimThisBusiness": false,
+          "location": {
+            "lat": 25.3696784,
+            "lng": 51.5485681
+          },
+          "totalScore": 4.5,
+          "permanentlyClosed": false,
+          "temporarilyClosed": false,
+          "placeId": "ChIJT22DPg3DRT4Rn2wRjQsAWzk",
+          "categories": [
+            "Gym"
+          ],
+          "fid": "0x3e45c30d3e836d4f:0x395b000b8d116c9f",
+          "cid": "4132897132653931679",
+          "reviewsCount": 87,
+          "imagesCount": 26,
+          "imageCategories": [
+            "All",
+            "Gym",
+            "Videos",
+            "Street View & 360°"
+          ],
+          "scrapedAt": "2025-11-24T10:32:13.414Z",
+          "googleFoodUrl": null,
+          "hotelAds": [],
+          "openingHours": [
+            {
+              "day": "Monday",
+              "hours": "6 AM to 8 PM"
+            },
+            {
+              "day": "Tuesday",
+              "hours": "6 AM to 8 PM"
+            },
+            {
+              "day": "Wednesday",
+              "hours": "6 AM to 8 PM"
+            },
+            {
+              "day": "Thursday",
+              "hours": "6 AM to 8 PM"
+            },
+            {
+              "day": "Friday",
+              "hours": "9:30 to 11:30 AM"
+            },
+            {
+              "day": "Saturday",
+              "hours": "10:30 AM to 2 PM"
+            },
+            {
+              "day": "Sunday",
+              "hours": "6 AM to 8 PM"
+            }
+          ],
+          "peopleAlsoSearch": [
+            {
+              "category": "People also search for",
+              "title": "F45 Training The Pearl",
+              "reviewsCount": 84,
+              "totalScore": 4.6
+            },
+            {
+              "category": "People also search for",
+              "title": "1969 Athletics",
+              "reviewsCount": 40,
+              "totalScore": 4.6
+            },
+            {
+              "category": "People also search for",
+              "title": "StrongBox Functional Fitness",
+              "reviewsCount": 114,
+              "totalScore": 4.6
+            },
+            {
+              "category": "People also search for",
+              "title": "The Club",
+              "reviewsCount": 4,
+              "totalScore": 4.5
+            },
+            {
+              "category": "People also search for",
+              "title": "Orangetheory Fitness The Pearl",
+              "reviewsCount": 107,
+              "totalScore": 4.6
+            }
+          ],
+          "placesTags": [],
+          "reviewsTags": [
+            {
+              "title": "atmosphere",
+              "count": 4
+            },
+            {
+              "title": "community",
+              "count": 4
+            },
+            {
+              "title": "receptionist",
+              "count": 3
+            },
+            {
+              "title": "front desk",
+              "count": 2
+            },
+            {
+              "title": "train",
+              "count": 2
+            },
+            {
+              "title": "management",
+              "count": 2
+            }
+          ],
+          "additionalInfo": {
+            "Accessibility": [
+              {
+                "Wheelchair accessible entrance": true
+              },
+              {
+                "Wheelchair accessible parking lot": true
+              }
+            ],
+            "Amenities": [
+              {
+                "Restroom": true
+              }
+            ],
+            "Payments": [
+              {
+                "Credit cards": true
+              },
+              {
+                "Debit cards": true
+              },
+              {
+                "NFC mobile payments": true
+              }
+            ]
+          },
+          "gasPrices": [],
+          "url": "https://www.google.com/maps/search/?api=1&query=CrossFit%20T23%20Qatar&query_place_id=ChIJT22DPg3DRT4Rn2wRjQsAWzk",
+          "searchPageUrl": "https://www.google.com/maps/search/Gyms/@25.37642255,51.549729150000005,17z?hl=en",
+          "searchString": "Gyms",
+          "language": "en",
+          "rank": 3,
+          "isAdvertisement": false,
+          "imageUrl": "https://lh3.googleusercontent.com/gps-cs-s/AG0ilSyFAp0PwowieVRIGoLqSZz8QonAm0R35bF2GGcve7PUDkFwnh72YvwozyAn788Y7W4anAzYEo1nSxE3sRngmRKMnpiNwxe2K84l3gZ3Z4DmnzDHok2fe9XoROnu-N9vZ2AX8EyWTQ=w408-h306-k-no",
+          "kgmid": "/g/11g7z6pvy_",
+          "subTitle": null,
+          "description": null,
+          "locatedIn": null,
+          "plusCode": "9G9X+VC Doha, Qatar",
+          "menu": null,
+          "reviewsDistribution": {
+            "oneStar": 8,
+            "twoStar": 1,
+            "threeStar": 1,
+            "fourStar": 5,
+            "fiveStar": 72
+          },
+          "reserveTableUrl": null,
+          "hotelStars": null,
+          "hotelDescription": null,
+          "checkInDate": null,
+          "checkOutDate": null,
+          "similarHotelsNearby": null,
+          "hotelReviewSummary": null,
+          "popularTimesLiveText": "Not too busy",
+          "popularTimesLivePercent": 23,
+          "popularTimesHistogram": {
+            "Su": [
+              {
+                "hour": 5,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 6,
+                "occupancyPercent": 62
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 78
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 62
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 46
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 40
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 34
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 31
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 18
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 34
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 68
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 53
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 40
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 28
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 0
+              }
+            ],
+            "Mo": [
+              {
+                "hour": 5,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 6,
+                "occupancyPercent": 65
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 84
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 81
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 62
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 40
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 40
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 34
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 37
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 37
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 56
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 59
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 78
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 46
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 0
+              }
+            ],
+            "Tu": [
+              {
+                "hour": 5,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 6,
+                "occupancyPercent": 43
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 46
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 40
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 34
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 31
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 31
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 40
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 78
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 96
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 100
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 81
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 59
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 0
+              }
+            ],
+            "We": [
+              {
+                "hour": 5,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 6,
+                "occupancyPercent": 53
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 71
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 59
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 56
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 37
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 31
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 21
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 21
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 40
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 71
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 93
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 84
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 75
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 56
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 0
+              }
+            ],
+            "Th": [
+              {
+                "hour": 5,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 6,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 50
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 40
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 31
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 21
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 21
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 15
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 18
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 25
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 37
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 65
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 75
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 68
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 40
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 0
+              }
+            ],
+            "Fr": [
+              {
+                "hour": 6,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 75
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 59
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 34
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 23,
+                "occupancyPercent": 0
+              }
+            ],
+            "Sa": [
+              {
+                "hour": 6,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 7,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 8,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 9,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 10,
+                "occupancyPercent": 18
+              },
+              {
+                "hour": 11,
+                "occupancyPercent": 18
+              },
+              {
+                "hour": 12,
+                "occupancyPercent": 37
+              },
+              {
+                "hour": 13,
+                "occupancyPercent": 31
+              },
+              {
+                "hour": 14,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 15,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 16,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 17,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 18,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 19,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 20,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 21,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 22,
+                "occupancyPercent": 0
+              },
+              {
+                "hour": 23,
+                "occupancyPercent": 0
+              }
+            ]
+          },
+          "additionalOpeningHours": null,
+          "openingHoursBusinessConfirmationText": null,
+          "questionsAndAnswers": [
+            {
+              "question": "What age Can enter the CrossFit?",
+              "answers": [
+                {
+                  "answer": "They have classes for kids and adults",
+                  "answeredBy": {}
+                }
+              ],
+              "askDate": "7 years ago",
+              "askedBy": {}
+            }
+          ],
+          "updatesFromCustomers": null,
+          "inputPlaceId": null,
+          "userPlaceNote": null,
+          "webResults": [
+            {
+              "title": "T23 Crossfit Gym in Qatar",
+              "displayedUrl": "https://www.cft23.com",
+              "url": "https://www.cft23.com/",
+              "description": "T23 is Qatar's premier functional fitness facility and home of CrossFit TXXIII, driven to help individuals become a stronger, healthier and better version ..."
+            },
+            {
+              "title": "T23 (@t23qatar) · Doha, Qatar · Instagram photos and videos",
+              "displayedUrl": "https://www.instagram.com › ...",
+              "url": "https://www.instagram.com/t23qatar/?hl\\u003den",
+              "description": "Strength, endurance, agility — all in one high-intensity class. The only licensed CrossFit affiliate in Qatar. This means we meet the high standards set by ..."
+            },
+            {
+              "title": "CrossFit TXXIII",
+              "displayedUrl": "https://www.crossfit.com › gym › crossfit-txxiii",
+              "url": "https://www.crossfit.com/gym/16774/crossfit-txxiii",
+              "description": "Doha, null. GET IN TOUCH. Qatar>Doha. CrossFit TXXIII. Doha / Qatar. Gym Details. 22 La Croisette, Parcel 12 Porto Arabia, The Pearl, Doha, Qatar."
+            }
+          ],
+          "tableReservationLinks": [],
+          "bookingLinks": [],
+          "orderBy": [],
+          "restaurantData": {
+            "tableReservationProvider": null
+          },
+          "ownerUpdates": [],
+          "domain": "cft23.com",
+          "scrapedUrls": [
+            "https://www.cft23.com/",
+            "https://www.cft23.com/team",
+            "https://www.cft23.com/#page",
+            "https://www.cft23.com/contact",
+            "https://www.cft23.com/about"
+          ],
+          "emails": [
+            "info@cft23.com"
+          ],
+          "phones": [],
+          "phonesUncertain": [
+            "1447419599",
+            "9459690",
+            "1726563734096",
+            "1726563734163",
+            "66854446",
+            "0923830",
+            "66854448295",
+            "93869712",
+            "1723473244787",
+            "1723473476834",
+            "8005-564929",
+            "485885752389419",
+            "664083010376297",
+            "1760978858046",
+            "1760808850110",
+            "1760544153068",
+            "1760025682275",
+            "+974 7701 6555",
+            "6685498408560",
+            "1738149045157",
+            "1738149045221",
+            "1723471366744",
+            "1723471366812",
+            "1723359672044",
+            "1723359672145",
+            "1747564799153",
+            "1747564799221",
+            "1723907069442",
+            "1723907069509",
+            "1725563811732",
+            "1725563811806",
+            "4160-9039",
+            "66854521",
+            "1723480771107",
+            "1723480771170",
+            "1967574",
+            "1565791693903",
+            "66854507523",
+            "1720019161490",
+            "1747735693247",
+            "1135366",
+            "477439368302312",
+            "832104013001625"
+          ],
+          "linkedIns": [],
+          "twitters": [],
+          "instagrams": [
+            "https://www.instagram.com/stories"
+          ],
+          "facebooks": [],
+          "youtubes": [],
+          "tiktoks": [],
+          "pinterests": [],
+          "discords": [],
+          "snapchats": [],
+          "threads": [],
+          "telegrams": [],
+          "reddits": [],
+          "whatsapps": [],
+          "imageUrls": [],
+          "images": [],
+          "reviews": [],
+          "leadsEnrichment": []
+        }
+      }
+    ]
+  },
+  "connections": {
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor2": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f43e2f81-7822-4aa2-936f-11798b7d1455",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a03d74449f09a0d103b11c0ee46ee8046d10d7cc69888a9d6870ac5124d16587"
+  },
+  "id": "59tbyNrb8DY6IX2z",
+  "tags": []
+}

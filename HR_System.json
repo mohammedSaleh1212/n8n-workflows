@@ -1,0 +1,499 @@
+{
+  "name": "HR_System",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {
+          "dataPropertyAttachmentsPrefixName": "attachment_",
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -864,
+        272
+      ],
+      "id": "d99e11b4-9286-4d15-86ac-c135ed372571",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bYScxW4sAhhQy2Zz",
+          "name": "mohammedCredentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "attachment_0",
+        "name": "= {{ $json.from.value[0].name }} resume",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1jwToTq4Ermky4q2hXj6zvbMHqQ_xMiGD",
+          "mode": "list",
+          "cachedResultName": "resumes",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1jwToTq4Ermky4q2hXj6zvbMHqQ_xMiGD"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -688,
+        400
+      ],
+      "id": "bc52e3f3-472d-4115-b62e-85f8841eb17d",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "4f0jdhEP9kQ2hRnh",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "attachment_0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        208
+      ],
+      "id": "0f401b4c-48f3-4e3d-a523-473c40c2ef40",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=candidate's resume:\n{{ $json.text }}",
+        "options": {
+          "systemMessage": "You are a technical recruiter evaluating resumes for frontend developer roles. Focus on React, UI design, and code modularity.\nreturn true if candidate is qualified\notherwise return false\nreturn either true or false no other data \nthis time return true"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -480,
+        208
+      ],
+      "id": "f10cc61a-1a74-4ab3-9b85-407df393bc03",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -480,
+        384
+      ],
+      "id": "817b76ca-6e85-4141-8b25-ca1232ce0d17",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a2c38b31-50dc-4fb7-b614-5e8c7a2ac1ee",
+              "leftValue": "={{ $json.output }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -176,
+        240
+      ],
+      "id": "44690578-f5d5-4846-a33f-0ac1d8b50ac6",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        560
+      ],
+      "id": "e7db6c93-19b5-453d-98bb-fd87992e5c76",
+      "name": "OpenAI Chat Model1"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Gmail Trigger').item.json.from.value[0].address }}",
+        "subject": "=job inquery response",
+        "emailType": "text",
+        "message": "={{ $json.output }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        656,
+        48
+      ],
+      "id": "a47dc6f4-d799-409d-9946-35d5be76cbfc",
+      "name": "Send a message1",
+      "webhookId": "3add0a18-744b-4c33-9dcb-5cda88880cfa",
+      "notesInFlow": false,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bYScxW4sAhhQy2Zz",
+          "name": "mohammedCredentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Gmail Trigger').item.json.from.value[0].address }}",
+        "subject": "=job inquery response {{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        368,
+        320
+      ],
+      "id": "84f9c982-9435-4d3a-a7e3-c3e4c3685847",
+      "name": "Send a message2",
+      "webhookId": "3add0a18-744b-4c33-9dcb-5cda88880cfa",
+      "notesInFlow": false,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bYScxW4sAhhQy2Zz",
+          "name": "mohammedCredentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=your job is to write a message to mr  {{ $('Gmail Trigger').item.json.from.value[0].name }} telling him that he is qualified and appoint a time and date after searching through googlge calender using the tools .the date must be in the next week from the sender submmision date . the meeting can only take place  between 12 pm and 5 pm and the meeting lasts only 30 minutes.pay  attention to date and time\ncurrent date/time: {{ $now }}\n\n\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4f819081-5a32-4e54-abc0-a41f739ebf61",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=the position candidate wanted to apply for: {{ $('Gmail Trigger').item.json.headers.subject }} \nhead of hr name: john smith\nthe candidate name:{{ $('Gmail Trigger').item.json.from.value[0].name }}\ncompany name: ourcompany",
+        "options": {
+          "systemMessage": "\nthis candidate was not qualified\nsend message to this candidate tell him that we apologize and tell him who we are name of our company"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -16,
+        384
+      ],
+      "id": "ec87184a-129f-40e4-b776-a01a771fba3d",
+      "name": "AI Agent generate unaccepted message"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        144
+      ],
+      "id": "1dfd7865-a3a5-4d9d-b025-2e71042b29dd",
+      "name": "OpenAI Chat Model2"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "mohammedsaleh999ms@gmail.com",
+          "mode": "list",
+          "cachedResultName": "mohammedsaleh999ms@gmail.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "attendees": [
+            "mohammedsaleh1999ms@gmail.com"
+          ],
+          "conferenceDataUi": {
+            "conferenceDataValues": {
+              "conferenceSolution": "hangoutsMeet"
+            }
+          },
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        304,
+        192
+      ],
+      "id": "689f0230-b44e-41f1-8f3e-4f7de5199550",
+      "name": "create event"
+    },
+    {
+      "parameters": {
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "mohammedsaleh999ms@gmail.com",
+          "mode": "list",
+          "cachedResultName": "mohammedsaleh999ms@gmail.com"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start_Time', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End_Time', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        144,
+        240
+      ],
+      "id": "1b63e881-d766-4dea-95ae-39cc58746423",
+      "name": "get availability"
+    },
+    {
+      "parameters": {
+        "options": {
+          "timezone": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Timezone', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.dateTimeTool",
+      "typeVersion": 2,
+      "position": [
+        240,
+        304
+      ],
+      "id": "af41c8a2-f0d1-4f6f-9540-9fa873b3b1f4",
+      "name": "Date & Time"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent generate unaccepted message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent generate unaccepted message",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent generate unaccepted message": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get availability": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d0a24cd4-8e89-4eb4-8c0b-1524181bcff7",
+  "meta": {
+    "instanceId": "a03d74449f09a0d103b11c0ee46ee8046d10d7cc69888a9d6870ac5124d16587"
+  },
+  "id": "GiWH6mv0HxMswHhB",
+  "tags": []
+}

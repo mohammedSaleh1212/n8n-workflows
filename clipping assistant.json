@@ -1,0 +1,1853 @@
+{
+  "name": "clipping assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.klap.app/v2/tasks/video-to-shorts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"source_video_url\": \"{{ $('Send message and wait for response').item.json.data.URL }}\",\n  \"language\": \"en\",\n  \"target_clip_count\": {{ $('Send message and wait for response').item.json.data.SHORTS }},\n  \"max_clip_count\": {{ $('Send message and wait for response').item.json.data.SHORTS }},\n  \"editing_options\": {\n    \"captions\": true,\n    \"reframe\": true,\n    \"emojis\": true,\n    \"remove_silences\": true,\n    \"intro_title\": false\n  },\n  \"min_duration\": 15,\n  \"max_duration\": 60,\n  \"target_duration\": 30\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1328,
+        128
+      ],
+      "id": "d3d01e4a-7836-4e18-8767-61bdedeead1a",
+      "name": "Analyze Video",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "waFHCHa4ofSN0jUR",
+          "name": "KlapApiKey"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6cc36a2f-8df2-4589-afca-5c51768016a2",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "ready",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -880,
+        48
+      ],
+      "id": "9185899c-414a-44f1-b0cf-c020caf167fa",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -656,
+        48
+      ],
+      "id": "6a118fbb-5cce-4dda-9039-a7f537f097dd",
+      "name": "Wait",
+      "webhookId": "37ebe983-1059-4959-81e0-e1cba1ee9130"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.klap.app/v2/tasks/{{ $json.id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "kak_UtI0LINx0lAEIOUMPQl0SKP1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1104,
+        128
+      ],
+      "id": "a8915fae-eb64-4b22-81af-4cab5a0bd2ec",
+      "name": "Check Status Of Analyzing Video"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.klap.app/v2/projects/{{ $json.output_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -656,
+        240
+      ],
+      "id": "96272743-ca5b-4772-828d-978ccacf0a27",
+      "name": "Get Short Ideas",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "waFHCHa4ofSN0jUR",
+          "name": "KlapApiKey"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.klap.app/v2/projects/{{ $('Check Status Of Analyzing Video').item.json.output_id }}/{{ $('Get Short Ideas').item.json.id }}/exports",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -208,
+        240
+      ],
+      "id": "0e78c392-79c4-4b24-b20b-56ab2fa33ec0",
+      "name": "Create High Resolution Short",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "waFHCHa4ofSN0jUR",
+          "name": "KlapApiKey"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.klap.app/v2/projects/{{ $('If').item.json.output_id }}/{{ $('Get Short Ideas').item.json.id }}/exports/{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        16,
+        240
+      ],
+      "id": "d1c6c721-ea15-407a-9b77-b3895cadb545",
+      "name": "Get High Resolution Short",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "waFHCHa4ofSN0jUR",
+          "name": "KlapApiKey"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ae6fbd8b-6d7c-4e3e-91ba-df9d8eecc73c",
+              "leftValue": "={{ $json.proceed }}",
+              "rightValue": "ready",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        464,
+        176
+      ],
+      "id": "ca1f0356-45d4-4a55-8d2d-1216685afdfa",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        688,
+        368
+      ],
+      "id": "ece733b6-7935-450a-9823-5f8fbe46ebf5",
+      "name": "Wait1",
+      "webhookId": "38091ea8-1509-4ceb-b0ce-f8af21754134"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1wNyyjMyd8afLx5ejve75YqcH5ewftud6sddkL0QcIz4",
+          "mode": "list",
+          "cachedResultName": "ai clips",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wNyyjMyd8afLx5ejve75YqcH5ewftud6sddkL0QcIz4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wNyyjMyd8afLx5ejve75YqcH5ewftud6sddkL0QcIz4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "created_at": "={{ $json.created_at }}",
+            "virality_score": "={{ $json.virality_score }}",
+            "status": "pending",
+            "transcript_text": "={{ $json.transcript_text }}",
+            "video_url": "=",
+            "caption_tiktok": "={{ $json.publication_captions.tiktok }}",
+            "caption_youtube": "={{ $json.publication_captions.youtube }}",
+            "caption_linkedin": "={{ $json.publication_captions.linkedin }}",
+            "caption_instagram": "={{ $json.publication_captions.instagram }}",
+            "approved": "false"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "virality_score",
+              "displayName": "virality_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "transcript_text",
+              "displayName": "transcript_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "video_url",
+              "displayName": "video_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "caption_tiktok",
+              "displayName": "caption_tiktok",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "caption_instagram",
+              "displayName": "caption_instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "caption_linkedin",
+              "displayName": "caption_linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "caption_youtube",
+              "displayName": "caption_youtube",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "failed_to",
+              "displayName": "failed_to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "approved",
+              "displayName": "approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "a2174b14-70ac-40fb-ae5a-f9a5b90651e9",
+      "name": "Google Sheets: Save Script Idea",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        -432,
+        240
+      ],
+      "typeVersion": 4.5,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "1eAoOKxHRJsgujKC",
+          "name": "Google Sheets account(mohammed)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1wNyyjMyd8afLx5ejve75YqcH5ewftud6sddkL0QcIz4",
+          "mode": "list",
+          "cachedResultName": "ai clips",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wNyyjMyd8afLx5ejve75YqcH5ewftud6sddkL0QcIz4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wNyyjMyd8afLx5ejve75YqcH5ewftud6sddkL0QcIz4/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "ready"
+            },
+            {
+              "lookupColumn": "approved",
+              "lookupValue": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1776,
+        688
+      ],
+      "id": "41797c96-e864-43a3-8a7e-0bcc5b5f863e",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "1eAoOKxHRJsgujKC",
+          "name": "Google Sheets account(mohammed)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nif (items.length === 0) {\n  throw new Error(\"No ready items found\");\n}\nreturn [items[0]]; // Only return the first row\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1552,
+        688
+      ],
+      "id": "9f033f0d-5124-4d55-a3af-643fb5736b26",
+      "name": "get single video for publish"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.upload-post.com/api/upload",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "user",
+              "value": "user1"
+            },
+            {
+              "name": "platform[]",
+              "value": "instagram"
+            },
+            {
+              "name": "title",
+              "value": "={{ $json.caption_instagram }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "video",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1104,
+        784
+      ],
+      "id": "0060a8e4-c02f-4cac-a022-44e3cc57a5cb",
+      "name": "post to instagram",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "R7va5LgFVMvbSzcP",
+          "name": "UploadPost"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.video_url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1328,
+        688
+      ],
+      "id": "fc6e9109-5d8a-415e-8f07-24d3f023377d",
+      "name": "download the clip"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6ba35def-3bea-4bc3-8dc3-d7502c1c02b2",
+              "leftValue": "={{ $json.results.facebook.post_id }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "4cdff7ca-9eea-4a4c-8f07-f35701b23c93",
+              "leftValue": "={{ $json.results.instagram.post_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -656,
+        688
+      ],
+      "id": "4822c7d3-f60a-4a87-9fa3-f61b452fb369",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -880,
+        688
+      ],
+      "id": "9b3ef290-5ada-4110-99ac-ff6a456510c0",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.upload-post.com/api/upload",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Apikey eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1vaGFtbWVkc2FsZWg5OTltc0BnbWFpbC5jb20iLCJleHAiOjQ5MTE5NzQwODgsImp0aSI6ImMwOGEyMDUwLWY4MjctNDhhOC1iNGVlLTk0ODFiMWI4MTEzMyJ9.fvv31aVb9iVn7lIcknJgpXhosI3q5hHj9-3uayzYjpc"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "user",
+              "value": "user1"
+            },
+            {
+              "name": "platform[]",
+              "value": "facebook"
+            },
+            {
+              "name": "title",
+              "value": "={{ $json.caption_tiktok }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "video",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "facebook_page_id",
+              "value": "697022183504005"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1104,
+        592
+      ],
+      "id": "cc437e36-6df1-4266-9b09-ee95539be3a9",
+      "name": "post to facebook",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "R7va5LgFVMvbSzcP",
+          "name": "UploadPost"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1wNyyjMyd8afLx5ejve75YqcH5ewftud6sddkL0QcIz4",
+          "mode": "list",
+          "cachedResultName": "ai clips",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wNyyjMyd8afLx5ejve75YqcH5ewftud6sddkL0QcIz4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wNyyjMyd8afLx5ejve75YqcH5ewftud6sddkL0QcIz4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('get single video for publish').item.json.id }}",
+            "status": "=success"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "virality_score",
+              "displayName": "virality_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "transcript_text",
+              "displayName": "transcript_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "video_url",
+              "displayName": "video_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "caption_tiktok",
+              "displayName": "caption_tiktok",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "caption_instagram",
+              "displayName": "caption_instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "caption_linkedin",
+              "displayName": "caption_linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "caption_youtube",
+              "displayName": "caption_youtube",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -432,
+        592
+      ],
+      "id": "4cf30eea-4e6e-4cee-be66-1a3e1abf2af7",
+      "name": "Update status to sucess",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "1eAoOKxHRJsgujKC",
+          "name": "Google Sheets account(mohammed)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1wNyyjMyd8afLx5ejve75YqcH5ewftud6sddkL0QcIz4",
+          "mode": "list",
+          "cachedResultName": "ai clips",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wNyyjMyd8afLx5ejve75YqcH5ewftud6sddkL0QcIz4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wNyyjMyd8afLx5ejve75YqcH5ewftud6sddkL0QcIz4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('get single video for publish').item.json.id }}",
+            "status": "finished with errors"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "virality_score",
+              "displayName": "virality_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "transcript_text",
+              "displayName": "transcript_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "video_url",
+              "displayName": "video_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "caption_tiktok",
+              "displayName": "caption_tiktok",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "caption_instagram",
+              "displayName": "caption_instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "caption_linkedin",
+              "displayName": "caption_linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "caption_youtube",
+              "displayName": "caption_youtube",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -432,
+        784
+      ],
+      "id": "020680f7-fdf6-4627-a8e0-ead5c6471f78",
+      "name": "update status to finished",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "1eAoOKxHRJsgujKC",
+          "name": "Google Sheets account(mohammed)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2000,
+        128
+      ],
+      "id": "ac94c978-f66a-4fe2-8a4b-512b0b88997b",
+      "name": "Telegram Trigger",
+      "webhookId": "aa48e0ca-1a02-4936-a871-7372f7756155",
+      "credentials": {
+        "telegramApi": {
+          "id": "G5ftDp7hs5rGlFn1",
+          "name": "Leadbot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $json.message.chat.id }}",
+        "message": "please provide the video url and the desired number of shorts",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "URL",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "SHORTS",
+              "fieldType": "number"
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1776,
+        128
+      ],
+      "id": "e4e4c3c9-52d2-454c-bb7a-7e3143e3b784",
+      "name": "Send message and wait for response",
+      "webhookId": "476a0d0c-8a0e-457c-90ae-6eb1009648db",
+      "credentials": {
+        "telegramApi": {
+          "id": "G5ftDp7hs5rGlFn1",
+          "name": "Leadbot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        912,
+        176
+      ],
+      "id": "ab399624-132b-4cf7-aa5f-aa3705a57148",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "sendVideo",
+        "chatId": "=704030551",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1360,
+        192
+      ],
+      "id": "c8aa8768-4eae-4121-95b2-98bb6b4193ce",
+      "name": "Send a video",
+      "webhookId": "7588a146-b08f-4659-a6f0-1447bf17a5a5",
+      "credentials": {
+        "telegramApi": {
+          "id": "G5ftDp7hs5rGlFn1",
+          "name": "Leadbot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Code1').item.json.src_url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1136,
+        192
+      ],
+      "id": "835eeeec-b1b8-4a05-a8b7-aae3ba1ae5fa",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1wNyyjMyd8afLx5ejve75YqcH5ewftud6sddkL0QcIz4",
+          "mode": "list",
+          "cachedResultName": "ai clips",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wNyyjMyd8afLx5ejve75YqcH5ewftud6sddkL0QcIz4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1wNyyjMyd8afLx5ejve75YqcH5ewftud6sddkL0QcIz4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "approved": "={{ $json.data.approval === \"approve\" ? \"true\" : \"false\" }}",
+            "video_url": "={{ $('HTTP Request').item.json.src_url }}",
+            "id": "={{ $('Loop Over Items').item.json.project_id }}",
+            "status": "ready"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "virality_score",
+              "displayName": "virality_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "transcript_text",
+              "displayName": "transcript_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "video_url",
+              "displayName": "video_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "caption_tiktok",
+              "displayName": "caption_tiktok",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "caption_instagram",
+              "displayName": "caption_instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "caption_linkedin",
+              "displayName": "caption_linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "caption_youtube",
+              "displayName": "caption_youtube",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "failed_to",
+              "displayName": "failed_to",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "approved",
+              "displayName": "approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1808,
+        272
+      ],
+      "id": "62d8cd2d-3bc0-4aa2-8351-576ee1099625",
+      "name": "Update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "1eAoOKxHRJsgujKC",
+          "name": "Google Sheets account(mohammed)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2000,
+        688
+      ],
+      "id": "fbb83c05-487c-4791-9846-0b040fd40cfe",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $json.result.chat.id }}",
+        "message": "please check the video ",
+        "responseType": "customForm",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "approval",
+              "fieldType": "radio",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "approve"
+                  },
+                  {
+                    "option": "reject"
+                  }
+                ]
+              },
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1584,
+        192
+      ],
+      "id": "ba2be33a-b471-40c2-8c2b-eb8077aa6873",
+      "name": "Send message and wait for response3",
+      "webhookId": "0db097cc-592c-4d02-a1ea-38de16c08c1c",
+      "credentials": {
+        "telegramApi": {
+          "id": "G5ftDp7hs5rGlFn1",
+          "name": "Leadbot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "your video is being analyzed\nthis might take a while",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1552,
+        128
+      ],
+      "id": "7becba72-bafb-45d0-8fe5-aaefcf2cc645",
+      "name": "Send a text message",
+      "webhookId": "713d71cb-822f-464f-a9fb-9b18101de4ca",
+      "credentials": {
+        "telegramApi": {
+          "id": "G5ftDp7hs5rGlFn1",
+          "name": "Leadbot"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        0
+      ],
+      "id": "c913fb56-0403-4496-99c4-bdca8c73906d",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const videos = items; // items is already an array of video objects\n\nconst allReady = videos.every(item => item.json.status === \"ready\");\n\nreturn [{\n  json: {\n    proceed: allReady,\n    readyVideos: videos\n      .filter(item => item.json.status === \"ready\")\n      .map(item => ({\n        id: item.json.id,\n        name: item.json.name,\n        src_url: item.json.src_url\n      })),\n    pending: videos\n      .filter(item => item.json.status !== \"ready\")\n      .map(item => ({\n        id: item.json.id,\n        status: item.json.status,\n        name: item.json.name\n      }))\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        176
+      ],
+      "id": "ce378fcf-b959-49ef-8c7d-78c46c3a3862",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "const videos = items[0].json.readyVideos; // this is the actual array\n\nreturn videos.map(video => ({\n  json: {\n    id: video.id,\n    name: video.name,\n    src_url: video.src_url\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        176
+      ],
+      "id": "29ecce61-1857-4d57-8250-db22c92c9351",
+      "name": "Code1"
+    }
+  ],
+  "pinData": {
+    "Analyze Video": [
+      {
+        "json": {
+          "id": "T823PBQcAwhq8pm5",
+          "type": "video-to-shorts",
+          "status": "processing",
+          "error_code": null,
+          "created_at": "2025-09-21T22:02:03.794Z",
+          "output_type": "folder",
+          "output_id": "BgpOGjaE"
+        }
+      }
+    ],
+    "Check Status Of Analyzing Video": [
+      {
+        "json": {
+          "id": "T823PBQcAwhq8pm5",
+          "type": "video-to-shorts",
+          "status": "ready",
+          "error_code": null,
+          "created_at": "2025-09-21T22:02:03.794Z",
+          "output_type": "folder",
+          "output_id": "BgpOGjaE"
+        }
+      }
+    ],
+    "Create High Resolution Short": [
+      {
+        "json": {
+          "id": "0401173f-1a68-442a-8734-d38bcb245f36",
+          "status": "processing",
+          "src_url": null,
+          "estimated_ready_at": "2025-09-21T22:10:44.736Z",
+          "project_id": "gZpAc8Jjoiqt",
+          "created_at": "2025-09-21T22:09:47.736Z",
+          "name": "The Power of Vocal Techniques in Communication",
+          "author_id": "a6922bfa-82db-412e-a848-17e8cb39c1f7",
+          "folder_id": "BgpOGjaE",
+          "descriptions": null
+        }
+      },
+      {
+        "json": {
+          "id": "8962c953-4d90-4eff-92ce-3b34f811a5cf",
+          "status": "processing",
+          "src_url": null,
+          "estimated_ready_at": "2025-09-21T22:10:47.758Z",
+          "project_id": "ZK6bIxfK32Nt",
+          "created_at": "2025-09-21T22:09:47.758Z",
+          "name": "The Seven Deadly Sins of Speaking",
+          "author_id": "a6922bfa-82db-412e-a848-17e8cb39c1f7",
+          "folder_id": "BgpOGjaE",
+          "descriptions": null
+        }
+      }
+    ],
+    "post to instagram": [
+      {
+        "json": {
+          "success": true,
+          "results": {
+            "instagram": {
+              "success": true,
+              "post_id": "18105493693605109",
+              "url": "https://www.instagram.com/reel/DO1BsQpD7-V/",
+              "media_type": "REELS",
+              "video_was_transcoded": false,
+              "changes": [],
+              "prevalidation_metadata": {
+                "width": 1080,
+                "height": 1920,
+                "fps": 30,
+                "duration": 48.704,
+                "container": "mov,mp4,m4a,3gp,3g2,mj2",
+                "video_codec": "h264",
+                "audio_codec": "aac"
+              }
+            }
+          },
+          "usage": {
+            "count": 6,
+            "limit": 10,
+            "last_reset": "2025-09-09T14:26:25.139742"
+          }
+        }
+      }
+    ],
+    "post to facebook": [
+      {
+        "json": {
+          "success": true,
+          "results": {
+            "facebook": {
+              "success": true,
+              "post_id": "1516856079309182",
+              "url": "https://www.facebook.com/reel/1516856079309182",
+              "content_type": "REELS",
+              "video_was_transcoded": false,
+              "changes": [],
+              "prevalidation_metadata": {
+                "width": 1080,
+                "height": 1920,
+                "fps": 30,
+                "duration": 48.704,
+                "container": "mov,mp4,m4a,3gp,3g2,mj2",
+                "video_codec": "h264",
+                "audio_codec": "aac"
+              }
+            }
+          },
+          "usage": {
+            "count": 5,
+            "limit": 10,
+            "last_reset": "2025-09-09T14:26:25.139742"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Analyze Video": {
+      "main": [
+        [
+          {
+            "node": "Check Status Of Analyzing Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get Short Ideas",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Check Status Of Analyzing Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Status Of Analyzing Video": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Short Ideas": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets: Save Script Idea",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create High Resolution Short": {
+      "main": [
+        [
+          {
+            "node": "Get High Resolution Short",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get High Resolution Short": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Get High Resolution Short",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets: Save Script Idea": {
+      "main": [
+        [
+          {
+            "node": "Create High Resolution Short",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "get single video for publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get single video for publish": {
+      "main": [
+        [
+          {
+            "node": "download the clip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "post to instagram": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "download the clip": {
+      "main": [
+        [
+          {
+            "node": "post to facebook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "post to instagram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Update status to sucess",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "update status to finished",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "post to facebook": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a video": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Send a video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response3": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Analyze Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9d69b9ba-b34e-482f-904c-03965ff93bcf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a03d74449f09a0d103b11c0ee46ee8046d10d7cc69888a9d6870ac5124d16587"
+  },
+  "id": "ll4mBKGTqxqe2KqT",
+  "tags": []
+}

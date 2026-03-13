@@ -1,0 +1,1643 @@
+{
+  "name": "messenger_auto_reply",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "844ad93a-8389-4733-ac80-6a5474a4eceb",
+              "leftValue": "={{ $json.query['hub.mode'] }}",
+              "rightValue": "subscribe",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "e3badc0c-3155-4922-b351-536d635ba3ab",
+              "leftValue": "={{ $json.query['hub.verify_token'] }}",
+              "rightValue": "demotoken",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1200,
+        -688
+      ],
+      "id": "380adcf9-d1e9-43bc-817f-9802bfb94b81",
+      "name": "If4"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        -1040
+      ],
+      "id": "c016fe69-19dc-4b14-bff5-91ba9fef3538",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "311f5676-fed1-4e29-8b45-43595fe3ce03",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1408,
+        -272
+      ],
+      "id": "54b14851-67aa-4617-8b59-dfd8ffe2cb0f",
+      "name": "Webhook",
+      "webhookId": "311f5676-fed1-4e29-8b45-43595fe3ce03"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query['hub.challenge'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -1008,
+        -1056
+      ],
+      "id": "cdd01053-386d-4cd4-a4b0-9216df4b9575",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7f561735-6971-4b60-acb9-5172f948ee6c",
+              "name": "message",
+              "value": "={{ $json.body.entry[0].messaging[0].message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "e8a70e40-ce88-4c33-b1ed-d5e62413fba0",
+              "name": "userId",
+              "value": "={{ $json.body.entry[0].messaging[0].sender.id }}",
+              "type": "string"
+            },
+            {
+              "id": "eb0dac62-fcd3-4cca-8e18-80ef5a545271",
+              "name": "username",
+              "value": "=user_{{ $json.body.entry[0].messaging[0].sender.id }}",
+              "type": "string"
+            },
+            {
+              "id": "f45474fe-7c4e-4f72-9ed7-a1b1c500e7f8",
+              "name": "sender id ",
+              "value": "={{ $json.body.entry[0].messaging[0].sender.id }}",
+              "type": "string"
+            },
+            {
+              "id": "2143b8f1-2974-4585-9065-df35d6dcf45d",
+              "name": "entry id ",
+              "value": "={{ $json.body.entry[0].id }}",
+              "type": "string"
+            },
+            {
+              "id": "cb283c51-ef82-4958-a315-af08c7b15d36",
+              "name": "messageId",
+              "value": "={{ $json.body.entry[0].messaging[0].message.mid }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        -544
+      ],
+      "id": "54e6c6ac-2c2b-434a-b43d-d0cfe568a0e4",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "149843a8-cac3-4f27-9ba8-2729f2b88c3a",
+              "leftValue": "={{ $json.body.entry[0].id }}",
+              "rightValue": "={{ $json.body.entry[0].changes[0].value.from.id }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -560,
+        -272
+      ],
+      "id": "2148cc86-67b8-4f23-8ba4-ef9bdea518c1",
+      "name": "Filter2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7f561735-6971-4b60-acb9-5172f948ee6c",
+              "name": "comment",
+              "value": "={{ $json.body.entry[0].changes[0].value.message }}",
+              "type": "string"
+            },
+            {
+              "id": "e8a70e40-ce88-4c33-b1ed-d5e62413fba0",
+              "name": "userId",
+              "value": "={{ $json.body.entry[0].changes[0].value.from.id }}",
+              "type": "string"
+            },
+            {
+              "id": "eb0dac62-fcd3-4cca-8e18-80ef5a545271",
+              "name": "name",
+              "value": "={{ $json.body.entry[0].changes[0].value.from.name }}",
+              "type": "string"
+            },
+            {
+              "id": "f45474fe-7c4e-4f72-9ed7-a1b1c500e7f8",
+              "name": "sender id ",
+              "value": "={{ $json.body.entry[0].changes[0].value.from.id }}",
+              "type": "string"
+            },
+            {
+              "id": "2143b8f1-2974-4585-9065-df35d6dcf45d",
+              "name": "entry id ",
+              "value": "={{ $json.body.entry[0].id }}",
+              "type": "string"
+            },
+            {
+              "id": "67118d87-3783-4fa8-8a23-62eeb3caf8da",
+              "name": "comment id ",
+              "value": "={{ $json.body.entry[0].changes[0].value.comment_id }}",
+              "type": "string"
+            },
+            {
+              "id": "9965e900-6662-433b-be58-85f9bb951175",
+              "name": "post_id",
+              "value": "={{ $('Webhook').item.json.body.entry[0].changes[0].value.post_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -272,
+        -272
+      ],
+      "id": "12f9080c-7292-4931-bffb-656f7e04942c",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "149843a8-cac3-4f27-9ba8-2729f2b88c3a",
+              "leftValue": "={{ $json.body.entry[0].id }}",
+              "rightValue": "={{ $json.body.entry[0].messaging[0].sender.id }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -496,
+        -544
+      ],
+      "id": "0babb785-c898-438b-aea3-4ed2c0db8c10",
+      "name": "Filter3"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an AI social media assistant for a tech company. Your task is to reply to user comments on Instagram or other platforms. Each reply should:\n\nRandomly pick one of these friendly opening sentences as the very first sentence:\n\n“Thanks for stopping by! 👋”\n\n“Always nice to hear from you! 😊”\n\n“Appreciate you being here! 💛”\n\n“Glad you dropped in! 🙌”\n\n“Thanks for the visit! 🌟”\n\n“So nice of you to comment! 💬”\n\n“Happy to see your message! 😄”\n\n“Thanks for taking the time! 🙏”\n\n“Your support means a lot! 💫”\n\n“Great to have you here! 💕”\n\n“Thanks for checking this out! 👏”\n\n“Appreciate the love! 💖”\n\n“Nice to see you around! 🌸”\n\n“Thanks for being part of the convo! 🗨️”\n\n“Glad you’re here! 💛”\n\nThank the user for their comment without repeating the exact comment text.\n\nPolitely suggest that the user can contact the company privately for more details or visit the website to explore the services.\n\nInclude the website: smplics.com.\n\nKeep the tone friendly, professional, and approachable.\n\nMake the reply concise and suitable for social media engagement.\n\nHere is the user comment: {{ $json.comment }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -96,
+        -272
+      ],
+      "id": "a44effc8-7f80-46a7-bba6-bb3973f53186",
+      "name": "Message a model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "d50Tbh0XGJWC5Bbv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9d0ada40-acaa-4eda-87cb-0adaa9a92672",
+                    "leftValue": "={{ $json.body.entry[0].messaging[0].message.mid }}",
+                    "rightValue": "status",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "message"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b0655702-38c7-4854-8329-32fef6d77a3c",
+                    "leftValue": "={{ $json.body.entry[0].changes[0].value.item }}",
+                    "rightValue": "comment",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "comment"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -832,
+        -304
+      ],
+      "id": "72903951-5c03-47c7-9707-74687640c12b",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1hMkh1ln1FXnHe5nZdKV1rQksxXnUrL8x8rEzrMCymyw",
+          "mode": "list",
+          "cachedResultName": "facebook messenger",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hMkh1ln1FXnHe5nZdKV1rQksxXnUrL8x8rEzrMCymyw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DcXSU0asIKpIE5RkeiPlgZWA5lkJ8-NMj3bzzhLRi5M/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message": "={{ $('Edit Fields2').item.json.message }}",
+            "userId": "={{ $('Edit Fields2').item.json.userId }}",
+            "type": "={{ $json.output[0].type }}",
+            "id": "={{ $('Edit Fields2').item.json.messageId }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "userId",
+              "displayName": "userId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1328,
+        -368
+      ],
+      "id": "3394a6e6-844d-4b4c-96b2-e20485f3ea61",
+      "name": "Append row in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BQxdMw9lmTS7j3AQ",
+          "name": "Google Sheets account (smplics)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v24.0/me/messages",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "privateToken"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"recipient\": {\n    \"id\": \"{{ $('Edit Fields2').item.json['sender id '] }}\"\n  },\n  \"messaging_type\": \"RESPONSE\",\n  \"message\": {\n    \"text\": \"{{ $json.reply }}\",\n    \"quick_replies\": [\n      {\n        \"content_type\": \"text\",\n        \"title\": \"🛠️ Services\",\n        \"payload\": \"SHOW_SERVICES\"\n      },\n      {\n        \"content_type\": \"text\",\n        \"title\": \"📞 CONTACT\",\n        \"payload\": \"SHOW_CONTACT\"\n      }\n    ]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1424,
+        -1088
+      ],
+      "id": "8e3b7a78-0093-4076-979c-7234117f7e80",
+      "name": "quick reply3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "08c6c284-fef4-41ee-a7c7-28cea7563ed0",
+              "leftValue": "={{ $json.body.entry[0].messaging[0].message.quick_reply }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -288,
+        -544
+      ],
+      "id": "cdcf5349-fe67-4f74-99b3-4911b427b071",
+      "name": "If5",
+      "notes": "this node figures weather the message sent from the user is regular message or quick reply"
+    },
+    {
+      "parameters": {
+        "action": "hmac",
+        "binaryData": true,
+        "type": "SHA256",
+        "dataPropertyName": "calculated_signature",
+        "secret": "2b638d0e31e9eda18a9fead29b8f1f02"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        -864
+      ],
+      "id": "94b91118-aba8-4301-a0ea-4a6bbc90240b",
+      "name": "Crypto: calculate signature"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.entry[0].messaging[0].message.quick_reply.payload }}",
+                    "rightValue": "SHOW_SERVICES",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "2591df04-62bd-4c69-96dc-4888a23e505f"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "services reply"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "50f4fbea-36df-4ba9-bfe2-d0e267a0841f",
+                    "leftValue": "={{ $json.body.entry[0].messaging[0].message.quick_reply.payload }}",
+                    "rightValue": "SHOW_CONTACT",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "contact reply"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        32,
+        -928
+      ],
+      "id": "678409dd-b1ee-4042-b78c-b74203930655",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://automation.urbatech.io/backend/facebook/messages/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "recipient_page_id",
+              "value": "={{ $('Filter3').item.json.body.entry[0].messaging[0].recipient.id }}"
+            },
+            {
+              "name": "sender_id",
+              "value": "= {{ $json.recipient_id }}"
+            },
+            {
+              "name": "sender_name",
+              "value": "=user_{{ $json.recipient_id }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $('Filter3').item.json.body.entry[0].messaging[0].message.text }}"
+            },
+            {
+              "name": "reply",
+              "value": "={{ $('Paresr code').item.json.reply }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1616,
+        -1088
+      ],
+      "id": "0971531f-b13d-421c-974b-e611328fa3ad",
+      "name": "save to database"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://automation.urbatech.io/backend/facebook/comments/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "recipient_id",
+              "value": "={{ $('Edit Fields3').item.json['entry id '] }}"
+            },
+            {
+              "name": "sender_id",
+              "value": "={{ $('Edit Fields3').item.json['sender id '] }}"
+            },
+            {
+              "name": "sender_name",
+              "value": "={{ $('Webhook').item.json.body.entry[0].changes[0].value.from.name }}"
+            },
+            {
+              "name": "comment",
+              "value": "={{ $('Edit Fields3').item.json.comment }}"
+            },
+            {
+              "name": "reply",
+              "value": "={{ $('Message a model3').item.json.message.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        608,
+        -192
+      ],
+      "id": "489820f0-b862-46bd-90d1-f4b6075a7645",
+      "name": "save to database2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v24.0/{{ $('Edit Fields3').item.json['comment id '] }}/comments",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "={{ $json.message.content }}"
+            },
+            {
+              "name": "access_token",
+              "value": "privateToken"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        -240
+      ],
+      "id": "4942728a-f2d4-4498-bfd6-e268b4bcff19",
+      "name": "reply to comments"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v24.0/{{ $('Edit Fields3').item.json['entry id '] }}/messages",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "privateToken"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"recipient\": {\n    \"comment_id\": \"{{ $('Webhook').item.json.body.entry[0].changes[0].value.comment_id }}\"\n  },\n  \"message\": {\n    \"text\": \"{{ $('Message a model3').item.json.message.content }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        416,
+        -240
+      ],
+      "id": "12f0bf11-8b40-4ee4-b504-b7457bc03390",
+      "name": "Private Replay"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v24.0/me/messages",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "PrivateToken"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"recipient\": {\n    \"id\": \"{{ $('Edit Fields2').item.json['sender id '] }}\"\n  },\n  \"messaging_type\": \"RESPONSE\",\n  \"message\": {\n    \"text\": \"{{ $('AI Agent1').item.json.output[0].reply }}\",\n    \"quick_replies\": [\n      {\n        \"content_type\": \"text\",\n        \"title\": \"🛠️ Services\",\n        \"payload\": \"SHOW_SERVICES\"\n      },\n      {\n        \"content_type\": \"text\",\n        \"title\": \"💰 Pricing\",\n        \"payload\": \"SHOW_PRICES\"\n      },\n      {\n        \"content_type\": \"text\",\n        \"title\": \"📞 CONTACT\",\n        \"payload\": \"SHOW_CONTACT\"\n      }\n    ]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2064,
+        -1296
+      ],
+      "id": "e13eb2f4-a84b-4e23-b80f-7a22c44b2364",
+      "name": "quick reply4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v24.0/me/messages",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "PrivtaeToken"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"recipient\": {\n    \"id\": \"{{ $json.body.entry[0].messaging[0].sender.id }}\"\n  },\n  \"messaging_type\": \"RESPONSE\",\n  \"message\": {\n    \"text\": \"Smplics provides a variety of services including UI/UX Design, Graphic Design, Web Development, Mobile App Development, Backend Services, Automation & AI Workflows, AI Solutions, Software Development, Support & Consultation, and Cloud Solutions.\",\n    \"quick_replies\": [\n      {\n        \"content_type\": \"text\",\n        \"title\": \"🛠️ Services\",\n        \"payload\": \"SHOW_SERVICES\"\n      },\n \n      {\n        \"content_type\": \"text\",\n        \"title\": \"📞 CONTACT\",\n        \"payload\": \"SHOW_CONTACT\"\n      }\n    ]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        -1104
+      ],
+      "id": "90883854-e56f-4601-9c88-ef6f6f4ccf46",
+      "name": "quick reply"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v24.0/me/messages",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "PrivateToken"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"recipient\": {\n    \"id\": \"{{ $json.body.entry[0].messaging[0].sender.id }}\"\n  },\n  \"messaging_type\": \"RESPONSE\",\n  \"message\": {\n    \"text\": \"You can contact Smplics via email at info@smplics.com or by phone at +(971)58584-0433. For more information, you can also visit our website smplics.com.\",\n    \"quick_replies\": [\n      {\n        \"content_type\": \"text\",\n        \"title\": \"🛠️ Services\",\n        \"payload\": \"SHOW_SERVICES\"\n      },\n\n      {\n        \"content_type\": \"text\",\n        \"title\": \"📞 CONTACT\",\n        \"payload\": \"SHOW_CONTACT\"\n      }\n    ]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        -784
+      ],
+      "id": "df2e6811-1077-4f23-8989-e9ecb08eb155",
+      "name": "quick reply1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        352
+      ],
+      "id": "0721d682-8c8f-469c-a4bb-a4ec7b30365d",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/792508507275640/insights/page_media_view",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "PrivateToken"
+            },
+            {
+              "name": "period",
+              "value": "day"
+            },
+            {
+              "name": "since",
+              "value": "2025-12-01"
+            },
+            {
+              "name": "until",
+              "value": "2025-12-6"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        448,
+        288
+      ],
+      "id": "b51bf08c-a489-4dfe-8029-866d8d7fc962",
+      "name": "reach"
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/792508507275640/insights/page_impressions_unique",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "PrivateToken"
+            },
+            {
+              "name": "period",
+              "value": "day"
+            },
+            {
+              "name": "since",
+              "value": "2025-12-01"
+            },
+            {
+              "name": "until",
+              "value": "2025-12-6"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        672,
+        288
+      ],
+      "id": "84f7e52a-3f3a-4cf1-89e5-082b1531051b",
+      "name": "reach(unique)"
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v19.0/792508507275640",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "id,name,username,picture{url},fan_count,followers_count,likes,link,about,description,category"
+            },
+            {
+              "name": "access_token",
+              "value": "PrivateToken"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        880,
+        288
+      ],
+      "id": "0ecde1f7-72d1-4b2a-8900-fa847e536724",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v24.0/792508507275640",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "id,name,username,picture{url},fan_count,followers_count,likes,link,about,description,category"
+            },
+            {
+              "name": "access_token",
+              "value": "PrivateToken"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        320
+      ],
+      "id": "c12565b3-4bea-460e-8664-a559a105237e",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v24.0/792508507275640/insights",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "metric",
+              "value": "post_reactions_like_total,post_reactions_love_total,post_reactions_wow_total,page_follows"
+            },
+            {
+              "name": "access_token",
+              "value": "PrivateToken"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        528,
+        464
+      ],
+      "id": "3715b86c-a51f-4b69-9994-2c0fa5273485",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v24.0/792508507275640/insights",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "metric",
+              "value": "post_reactions_like_total,post_reactions_love_total,post_reactions_wow_total,page_follows,page_actions_post_reactions_total"
+            },
+            {
+              "name": "access_token",
+              "value": "PrivateToken"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        272,
+        480
+      ],
+      "id": "1e6642db-ebd5-4acc-a6e1-456ead0f312c",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/792508507275640/insights",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "metric",
+              "value": "post_reactions_like_total,post_reactions_love_total,post_reactions_wow_total  "
+            },
+            {
+              "name": "access_token",
+              "value": "PrivateToken"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        432,
+        640
+      ],
+      "id": "a4743534-d2ac-45d4-9818-34c9dffa3668",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\nMessage: {{ $json.message }}\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an AI agent for a tech company called \"Smplics\".\nsmplics stands for simple smart impactfull solutions\nLanguage Handling Rules:\n- Detect whether the user's message is in Arabic or English.\n- Reply in the same language as the user's message.\nYour tasks are:  \n1. Provide a natural reply to the user.  \n2. Answer questions based on the company information below.\n3 . dont ever answer questions not related to our company \n** example: if the user asks how to cook something or asked you to write some html code or anything that is outside inqueries just apologize for answering.\n--- COMPANY INFORMATION (KNOWLEDGE BASE) ---\nCompany Name: Smplics\nIndustry: Software Development, Automation, AI Integration\n\nAbout Smplics:\nSmplics specializes in:\n1. UI/UX Design \n3. Graphic Design \n4. Web Development \n5. Mobile App Development \n6. Backend Services\n7. Automation & AI Workflows\n8. AI Solutions\n9. Software Development\n10. Support & Consultation \n11. Cloud Solutions \n\nMission:\nTo simplify complex business processes using intelligent, scalable technology.\n\n\nContact Details:\n-Email: info@smplics.com\n-phone number: +(971)58584-0433\n-website: smplics.com\n\nFAQ:\n-Do you offer free consultations?\nYes, we offer a complimentary 30-minute consultation to discuss your needs and how we can help.\n-Can I visit your office for a meeting?\nYes, you can schedule an in-person meeting at our office. Please contact us in advance to arrange a convenient time.\n\n--- Rules ---\nanswer to the user question based on the knowledge base.\ndont provide any corrupted answers.\nif user asks about something related to our company and  not montioned in the data just give them contact details.\n- dont ever give answers on questions that is not related to our company just apologize.\n\n\nCRITICAL: You must respond ONLY with a JSON object. No markdown, no backticks, no \"Sure, here is your response\". Format: {\"reply\": \"your message here\"}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        912,
+        -976
+      ],
+      "id": "04b9cee9-e785-4c6b-a96d-80417999b6fc",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "maxTokens": 2000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        896,
+        -768
+      ],
+      "id": "1de0fbc0-1dd9-4e98-a380-094d21c3d886",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "d50Tbh0XGJWC5Bbv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Bulletproof JSON Extraction\nlet raw = $json.output || \"\";\nlet response = {\n  reply: \"I'm having a technical hiccup. Could you try that again?\",\n  success: false,\n  raw_output: raw\n};\n\ntry {\n  // 1. Clean the fluff\n  let cleaned = raw.replace(/```json/g, '').replace(/```/g, '').trim();\n  \n  // 2. Extract the object\n  const start = cleaned.indexOf('{');\n  const end = cleaned.lastIndexOf('}');\n\n  if (start !== -1 && end !== -1) {\n    const jsonString = cleaned.substring(start, end + 1);\n    const parsed = JSON.parse(jsonString);\n    \n    if (parsed.reply) {\n      response.reply = parsed.reply;\n      response.success = true;\n    }\n  }\n} catch (e) {\n  // Log the error internally but don't crash the node\n  response.error_details = e.message;\n}\n\nreturn response;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        -976
+      ],
+      "id": "b8f437f9-41ac-4ccb-95fb-8df85eaeda8a",
+      "name": "Paresr code"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI agent for a tech company called \"Smplics\".\n\nYour tasks are:  \n1. Classify the user's message.  \n2. If the message is a simple greeting, classify it as \"greeting\".\nImportant: Only return a JSON array as output. Do not include any extra text, explanations, or additional keys. The JSON array must contain objects with exactly one field: \"type\".\n--- COMPANY INFORMATION (KNOWLEDGE BASE) ---\ncompany name: smplics\n--- TASK ---\nAnalyze the user's message and classify it as one of the following: inquiry, complaint, review, greeting. Return only the JSON array, no extra text. \nOutput format (single-line JSON array):\n\n[\n  {\n    \"type\": \"complaint\",\n  }\n]\n\nMessage: {{ $json.message }}\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Output format (single-line JSON array):\n\n  {\n    \"type\": \"complaint\"\n  }\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        800,
+        -448
+      ],
+      "id": "6e8d41fb-1e00-4c36-afc8-4c0dcc1bdb63",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        -272
+      ],
+      "id": "52b28dc1-8571-4491-9362-34318b4fc190",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "d50Tbh0XGJWC5Bbv",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "[\n  {\n      \"type\": \"complaint\"\n  }\n]"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1024,
+        -256
+      ],
+      "id": "068c66f2-a093-43f8-ac5a-e8159aee31f1",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e7708946-b6e1-4c3d-8678-b0ad033232a1",
+              "leftValue": "={{ $json.output[0].type }}",
+              "rightValue": "greeting",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1104,
+        -400
+      ],
+      "id": "716dd81f-79a0-451c-b549-074e92e8912c",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        -544
+      ],
+      "id": "15587a30-10b8-445b-b29d-0dfa2d7b208f",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json['sender id '] }}",
+        "collectionName": "facebook_conversations",
+        "databaseName": "smplics_ai"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryMongoDbChat",
+      "typeVersion": 1,
+      "position": [
+        976,
+        -688
+      ],
+      "id": "30df8158-475d-4597-bfad-1437af8ba213",
+      "name": "MongoDB Chat Memory",
+      "credentials": {
+        "mongoDb": {
+          "id": "jv08bAElCC4bVEnk",
+          "name": "MongoDB account(urbatech)"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "connection": "close",
+            "host": "n8n.urbatech.io",
+            "x-real-ip": "10.0.0.2",
+            "x-forwarded-proto": "https",
+            "x-forwarded-host": "n8n.urbatech.io",
+            "x-forwarded-for": "2a03:2880:12ff:4e::, 10.0.0.2",
+            "content-length": "339",
+            "cf-ray": "9c582765746df0b1-DFW",
+            "x-hub-signature-256": "sha256=6fc85d0324ec7b9e245198a06f7fba6597c62d0859cb3081d0137e0dd7857f34",
+            "accept-encoding": "gzip, br",
+            "x-hub-signature": "sha1=d6268eafde8d2aa1fe59383cc1e7d738ffcd4372",
+            "facebook-api-version": "v23.0",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-connecting-ip": "2a03:2880:12ff:4e::",
+            "user-agent": "facebookexternalua",
+            "cf-worker": "urbatech.io",
+            "cf-ipcountry": "US",
+            "accept": "*/*",
+            "content-type": "application/json",
+            "cf-ew-via": "15",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "object": "page",
+            "entry": [
+              {
+                "time": 1769683671781,
+                "id": "792508507275640",
+                "messaging": [
+                  {
+                    "sender": {
+                      "id": "25252046617739223"
+                    },
+                    "recipient": {
+                      "id": "792508507275640"
+                    },
+                    "timestamp": 1769683671233,
+                    "message": {
+                      "mid": "m_9dXt9p0luFTGt0Ppgrc6U59fsZaNS_naEErOD1yNwpK4mjk1JS7EIv3dS1RI6hh1v-RuHtQIT5N7gla5WFS7AA",
+                      "text": "do you offer free consultations?"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "webhookUrl": "https://n8n.urbatech.io/webhook/311f5676-fed1-4e29-8b45-43595fe3ce03",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0,
+          "input": 1
+        }
+      }
+    ]
+  },
+  "connections": {
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Message a model3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter3": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model3": {
+      "main": [
+        [
+          {
+            "node": "reply to comments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Filter3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Filter2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Append row in sheet2": {
+      "main": [
+        []
+      ]
+    },
+    "quick reply3": {
+      "main": [
+        [
+          {
+            "node": "save to database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto: calculate signature": {
+      "main": [
+        []
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "quick reply",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "quick reply1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reply to comments": {
+      "main": [
+        [
+          {
+            "node": "Private Replay",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reach": {
+      "main": [
+        []
+      ]
+    },
+    "reach(unique)": {
+      "main": [
+        []
+      ]
+    },
+    "Private Replay": {
+      "main": [
+        [
+          {
+            "node": "save to database2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "quick reply4": {
+      "main": [
+        []
+      ]
+    },
+    "AI Agent3": {
+      "main": [
+        [
+          {
+            "node": "Paresr code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Paresr code": {
+      "main": [
+        [
+          {
+            "node": "quick reply3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0f13cee0-3818-4fb7-a190-af4925b34a2c",
+  "meta": {
+    "instanceId": "a03d74449f09a0d103b11c0ee46ee8046d10d7cc69888a9d6870ac5124d16587"
+  },
+  "id": "ZkX0YO0ZVlNJAuw2",
+  "tags": []
+}

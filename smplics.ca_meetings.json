@@ -1,0 +1,693 @@
+{
+  "name": "smplics.ca_meetings",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "smplics.com@gmail.com",
+          "mode": "list",
+          "cachedResultName": "smplics.com@gmail.com"
+        },
+        "timeMin": "={{ $json.body.rangeStart }}",
+        "timeMax": "={{ $json.body.rangeEnd }}",
+        "options": {
+          "outputFormat": "bookedSlots",
+          "timezone": {
+            "__rl": true,
+            "value": "UTC",
+            "mode": "list",
+            "cachedResultName": "UTC"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        32,
+        80
+      ],
+      "id": "3997aa48-b2c5-4664-8db0-b49e4c0e27a9",
+      "name": "Get availability in a calendar",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "VQaox8zWUsbnI46E",
+          "name": "Google Calendar (smplics)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        928,
+        80
+      ],
+      "id": "cc73f82d-de8f-4e83-8b8c-d8deeee38772",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": true,\n  \"message\":\"meeting created and email sent to the client successfuly\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1824,
+        304
+      ],
+      "id": "97e5ccb7-d21a-4b80-a0ce-6b95975909fb",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4d01eb47-57bb-4997-a9dc-6d94bed84bcc",
+              "name": "meeting_slots",
+              "value": "={{ $json }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        80
+      ],
+      "id": "47568437-a4a1-45b6-8461-7d6bc7ef4861",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    meeting_slots: $input.all().map(item => item.json.meeting_slots),\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        80
+      ],
+      "id": "1f3831b5-03fd-4a3c-ae1c-916f5be0998b",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Access the admin timezone once from the first item\nconst adminTimeZone = $input.first().json.admin_time_zone || 'Asia/Dubai'; \n\nreturn items.map(item => {\n  const isoString = item.json.meeting_start_time; \n  const userTimeZone = item.json.user_time_zone || 'UTC'; \n  \n  const date = new Date(isoString);\n\n  // Common options for formatting\n  const getOptions = (tz) => ({\n    weekday: 'long',\n    year: 'numeric',\n    month: 'long',\n    day: 'numeric',\n    hour: 'numeric',\n    minute: '2-digit',\n    hour12: true,\n    timeZone: tz\n  });\n\n  // User formatting\n  const userReadable = new Intl.DateTimeFormat('en-US', getOptions(userTimeZone)).format(date);\n\n  // Admin formatting (Dubai)\n  const adminReadable = new Intl.DateTimeFormat('en-US', getOptions(adminTimeZone)).format(date);\n\n  return {\n    json: {\n      ...item.json,\n      meeting_start_time_local: userReadable,\n      meeting_start_time_admin: adminReadable // New value for the Dubai admin\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        400
+      ],
+      "id": "f806f926-a038-4f04-acd4-d102bfd47bad",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "smplics.com@gmail.com",
+          "mode": "list",
+          "cachedResultName": "smplics.com@gmail.com"
+        },
+        "start": "={{ $('Code in JavaScript4').item.json.meeting_start_time }}",
+        "end": "={{ new Date(new Date($('Code in JavaScript4').item.json.meeting_start_time).getTime() + 60*30*1000).toISOString() }}",
+        "additionalFields": {
+          "attendees": [
+            "={{ $('Code in JavaScript4').item.json.customer_email }}"
+          ],
+          "conferenceDataUi": {
+            "conferenceDataValues": {
+              "conferenceSolution": "hangoutsMeet"
+            }
+          },
+          "description": "=Discussion About {{ $('Code in JavaScript4').item.json.service }} with {{ $('Code in JavaScript4').item.json.customer_name }}",
+          "sendUpdates": "none",
+          "summary": "=Discussion: {{ $('Code in JavaScript4').item.json.service }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        928,
+        304
+      ],
+      "id": "2768ccd9-e567-4faa-9914-edda2d52ad01",
+      "name": "Create an event1",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "VQaox8zWUsbnI46E",
+          "name": "Google Calendar (smplics)"
+        }
+      },
+      "notes": "this node will send an email by default\nwe disabled that and added custom gmail node to send custom email"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('set data coming from the client').item.json.customer_email }}",
+        "subject": "={{ $json.emailSubject }}",
+        "message": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Meeting Invitation</title>\n</head>\n<body style=\"margin: 0; padding: 0; font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; background-color: #f8f9fa; line-height: 1.6;\">\n    \n    <!-- Main container -->\n    <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff;\">\n        <!-- Orange header -->\n        <tr>\n            <td style=\"background-color: #292824; padding: 30px 20px; text-align: center;\">\n<img src=\"https://res.cloudinary.com/dfmjuyexh/image/upload/v1769438541/smplicslogoGmail_ircxmu.png\" \n     alt=\"Test Logo\" \n     style=\"height: 40px; width: auto;\">\n\n                <h1 style=\"color: #ffffff; font-size: 24px; font-weight: 600; margin: 0; padding: 0;\">Meeting Invitation</h1>\n                <p style=\"color: rgba(255, 255, 255, 0.9); font-size: 14px; margin: 10px 0 0 0;\">You've been invited to a meeting</p>\n            </td>\n        </tr>\n        \n        <!-- Content area -->\n        <tr>\n            <td style=\"padding: 40px 30px;\">\n                <!-- Main meeting info -->\n                <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">\n                    <tr>\n                        <td style=\"padding-bottom: 30px;\">\n                            <h2 style=\"color: #333333; font-size: 20px; font-weight: 600; margin: 0 0 10px 0; border-bottom: 2px solid #ee7639; padding-bottom: 10px;\">\n                                Meeting Details\n                            </h2>\n                        </td>\n                    </tr>\n                    \n                    <!-- Description -->\n                    <tr>\n                        <td style=\"padding-bottom: 15px;\">\n                            <div style=\"background-color: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #ee7639;\">\n                                <div style=\"color: #ee7639; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;\">Description</div>\n                                <div style=\"color: #555555; font-size: 15px; line-height: 1.6;\">\n{{ $json.emailBody }}\n                                </div>\n                            </div>\n                        </td>\n                    </tr>\n                    \n                    <!-- Date & Time -->\n                    <tr>\n                        <td style=\"padding-bottom: 15px;\">\n                            <div style=\"background-color: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #ee7639;\">\n                                <div style=\"color: #ee7639; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;\">Date & Time</div>\n                                <div style=\"color: #333333; font-size: 16px; font-weight: 500; margin-bottom: 5px;\">\n                                    {{ $('Code in JavaScript4').item.json.meeting_start_time_local }}\n                                </div>\n                                <div style=\"color: #666666; font-size: 14px;\">\n                                    {{ $('Code in JavaScript4').item.json.user_time_zone }} timezone\n                                </div>\n                            </div>\n                        </td>\n                    </tr>\n                    \n                    <!-- Organizer -->\n                    <tr>\n                        <td style=\"padding-bottom: 15px;\">\n                            <div style=\"background-color: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #ee7639;\">\n                                <div style=\"color: #ee7639; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;\">Organizer</div>\n                                <div style=\"color: #333333; font-size: 16px; font-weight: 500; word-break: break-all;\">{{ $('Create an event1').item.json.creator.email }}\n          \n                                </div>\n                            </div>\n                        </td>\n                    </tr>\n                    \n                    <!-- Attendee (You) -->\n                    <tr>\n                        <td style=\"padding-bottom: 15px;\">\n                            <div style=\"background-color: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #ee7639;\">\n                                <div style=\"color: #ee7639; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;\">You</div>\n                                <div style=\"color: #333333; font-size: 16px; font-weight: 500; word-break: break-all;\">\n{{ $('Create an event1').item.json.attendees[0].email }}\n                                </div>\n                            </div>\n                        </td>\n                    </tr>\n                </table>\n                \n                <!-- Join Button -->\n                <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin: 40px 0;\">\n                    <tr>\n                        <td align=\"center\">\n                            <a href=\"{{ $('Create an event1').item.json.conferenceData.entryPoints[0].uri }}\" \n                               style=\"display: inline-block; background-color: #ee7639; color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 50px; font-weight: 600; font-size: 16px; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(238, 118, 57, 0.3);\">\n                                Join Google Meet\n                            </a>\n                        </td>\n                    </tr>\n                    <tr>\n                        <td align=\"center\" style=\"padding-top: 15px;\">\n                            <a href=\"{{ $('Create an event1').item.json.conferenceData.entryPoints[0].uri }}\" \n                               style=\"color: #ee7639; font-size: 14px; text-decoration: none; word-break: break-all; display: inline-block; max-width: 90%;\">{{ $('Create an event1').item.json.conferenceData.entryPoints[0].uri }}\n                           \n                            </a>\n                        </td>\n                    </tr>\n                </table>\n                \n                <!-- Help text -->\n                <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">\n                    <tr>\n                        <td style=\"padding-top: 30px; border-top: 1px solid #e9ecef;\">\n                            <p style=\"color: #666666; font-size: 14px; line-height: 1.5; margin: 0; text-align: center;\">\n                                Please join the meeting on time. If you're unable to attend or have questions, \n                                please contact the organizer directly.\n                            </p>\n                        </td>\n                    </tr>\n                </table>\n            </td>\n        </tr>\n        \n        <!-- Footer -->\n        <tr>\n            <td style=\"background-color: #292824; padding: 30px 20px; text-align: center;\">\n                <!-- Contact link only -->\n                <div style=\"margin-bottom: 15px;\">\n                    <a href=\"https://smplicsai.com/contact\" \n                       style=\"color: #ee7639; text-decoration: none; font-size: 14px; font-weight: 500; display: inline-block;\">\n                        Contact Us\n                    </a>\n                </div>\n                \n                <!-- Copyright -->\n                <div style=\"color: #adb5bd; font-size: 12px; margin-top: 10px;\">\n                    &copy; {{ new Date().getFullYear() }} Smplics. All rights reserved.\n                </div>\n            </td>\n        </tr>\n    </table>\n    \n</body>\n</html>\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1376,
+        304
+      ],
+      "id": "e30deb0d-d00e-4ff1-ba91-9284886ef2db",
+      "name": "Send a message",
+      "webhookId": "65bc3207-c24f-470c-aa1d-6d944e9ab288",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "34UMxMY3tebVxaVO",
+          "name": "gmail credentials (smplics)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "smplics.com@gmail.com",
+          "mode": "list",
+          "cachedResultName": "smplics.com@gmail.com"
+        },
+        "timeMin": "={{ $json.meeting_start_time }}",
+        "timeMax": "={{ DateTime.fromISO($json.meeting_start_time, { zone: 'utc' }).plus({ minutes: 30 }).toUTC().toISO() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        480,
+        400
+      ],
+      "id": "06eb3823-2750-400d-aac6-f0de20b998fb",
+      "name": "Get availability in a calendar1",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "VQaox8zWUsbnI46E",
+          "name": "Google Calendar (smplics)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2c18d2c3-597f-4c0b-a69b-8cdca0055c2f",
+              "leftValue": "={{ $json.available }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        704,
+        400
+      ],
+      "id": "6c61717b-2fae-4b28-95a2-8e38ff791d86",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"success\": false,\n  \"message\":\"selected date is not avaiable\"\n}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        928,
+        496
+      ],
+      "id": "1ee66d3a-40a7-4668-b9f3-501288b783fa",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "af542988-8bae-4b5e-add3-786846ec8547",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -192,
+        80
+      ],
+      "id": "59ee54f0-131b-420e-b091-152745879727",
+      "name": "Webhook",
+      "webhookId": "af542988-8bae-4b5e-add3-786846ec8547"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "3b7be704-f82c-4eb8-b6d8-f96fc41a7b9d",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -192,
+        400
+      ],
+      "id": "681ae443-59df-4e95-a92c-133474fe99cf",
+      "name": "Webhook1",
+      "webhookId": "3b7be704-f82c-4eb8-b6d8-f96fc41a7b9d"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1589c64d-6a0d-4c81-a1a1-d2b627718342",
+              "name": "customer_email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "d3c119cd-18ca-4674-93d9-8f21dbea51a5",
+              "name": "customer_message",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            },
+            {
+              "id": "4da8a1a4-d355-4a74-b892-e07ef690c36b",
+              "name": "meeting_start_time",
+              "value": "={{ $json.body.selectedSlot }}",
+              "type": "string"
+            },
+            {
+              "id": "4e74abb7-7008-4619-bf15-a128a1a36fac",
+              "name": "user_time_zone",
+              "value": "={{ $json.body.timezone }}",
+              "type": "string"
+            },
+            {
+              "id": "6494a673-5417-43e0-8c61-7928177210ec",
+              "name": "service",
+              "value": "={{ $json.body.service }}",
+              "type": "string"
+            },
+            {
+              "id": "9c5b0823-c75c-4580-801d-1fa7e69b62ed",
+              "name": "customer_name",
+              "value": "={{ $json.body.name }}",
+              "type": "string"
+            },
+            {
+              "id": "dd843237-7905-4adf-b3e4-a9fc7d601857",
+              "name": "admin_time_zone",
+              "value": "Asia/Dubai",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        32,
+        400
+      ],
+      "id": "a0c9c911-1784-43e9-9e71-34b8d2514d79",
+      "name": "set data coming from the client"
+    },
+    {
+      "parameters": {
+        "jsCode": "const serviceId = $('set data coming from the client').first().json.service;\nconst name = $('set data coming from the client').first().json.customer_name;\nconst adminTz = $('set data coming from the client').first().json.admin_time_zone;\nconst adminTime = $('Code in JavaScript4').first().json.meeting_start_time_admin;\n\n// --- Service Templates ---\nconst serviceTemplates = {\n  \"ai-receptionists\": {\n    subject: \"Confirmation: AI Receptionist Consultation\",\n    description: \"Thank you for your interest in our 24/7 AI Receptionists. We look forward to discussing how automated call handling and lead capture can streamline your front desk operations.\"\n  },\n  \"high-end-web-design\": {\n    subject: \"Confirmation: Premium Web Design Strategy Session\",\n    description: \"Your session regarding High-End Web Design is confirmed. We are excited to show you how conversion-focused architecture can turn your visitors into loyal customers.\"\n  },\n  \"review-generation\": {\n    subject: \"Confirmation: 5-Star Review Generation Planning\",\n    description: \"We’ve received your request for our Review Generation system. We’ll be discussing how to automate your social proof and skyrocket your local SEO rankings.\"\n  },\n  \"google-ads\": {\n    subject: \"Confirmation: Google Ads Management Strategy\",\n    description: \"Your consultation for Google Ads is set. Our goal is to review your current ad spend and plan a campaign that puts your business at the top of search results.\"\n  },\n  \"seo-optimization\": {\n    subject: \"Confirmation: Organic SEO Growth Session\",\n    description: \"We are ready to dive into your SEO Optimization strategy. We will focus on improving your technical structure and long-term organic visibility.\"\n  },\n  \"default\": {\n    subject: \"Appointment Confirmation: Smplics Solutions\",\n    description: \"This is a formal confirmation of your scheduled meeting with our team. We look forward to discussing your business requirements and growth goals.\"\n  }\n};\n\nconst content = serviceTemplates[serviceId] || serviceTemplates[\"default\"];\n\nreturn {\n  emailSubject: content.subject,\n  emailBody: `Dear ${name},\\n\\n${content.description}\\n\\nWe look forward to our session.\\n\\nBest regards,\\nSmplics Solutions Team`,\n\n  adminSubject: `NEW BOOKING: ${name} (${serviceId})`,\n  adminBody: `Action Required: A new meeting has been scheduled.\\n\\nCustomer Name: ${name}\\nService: ${serviceId}\\nTime: ${adminTime} (${adminTz})\\n\\nPlease check the Google Calendar for details.`\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1152,
+        304
+      ],
+      "id": "7e6a55cc-bffd-4570-9a8a-51ac8e22a317",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ================= CONFIG =================\nconst SLOT_MINUTES = 30;\nconst WORK_START_HOUR_UTC = 6;\nconst WORK_END_HOUR_UTC = 14;\nconst NO_WORK_DAY_UTC = 5; // Friday\n\n// Get boundaries from your Webhook\nconst rangeStartStr = $('Webhook').first().json.body.rangeStart;\nconst rangeEndStr = $('Webhook').first().json.body.rangeEnd;\n\nconst rangeStart = new Date(rangeStartStr);\nconst rangeEnd = new Date(rangeEndStr);\nconst now = new Date(); \n// =========================================\n\n// --- THE FIX IS HERE ---\n// Your JSON uses \"meeting_slots\", not \"busy\"\nconst inputData = items[0].json.meeting_slots || [];\n\nconst busySlots = inputData.map(s => ({\n  start: new Date(s.start),\n  end: new Date(s.end),\n}));\n\n// Overlap check helper\nconst overlaps = (aStart, aEnd, bStart, bEnd) => aStart < bEnd && aEnd > bStart;\n\nconst results = [];\nconst cursor = new Date(rangeStart);\n\nwhile (cursor < rangeEnd) {\n  const dayOfWeekUTC = cursor.getUTCDay();\n\n  if (dayOfWeekUTC === NO_WORK_DAY_UTC) {\n    cursor.setUTCDate(cursor.getUTCDate() + 1);\n    continue;\n  }\n\n  const dayStart = new Date(cursor);\n  dayStart.setUTCHours(WORK_START_HOUR_UTC, 0, 0, 0);\n\n  const dayEnd = new Date(cursor);\n  dayEnd.setUTCHours(WORK_END_HOUR_UTC, 0, 0, 0);\n\n  const slots = [];\n  let slotStart = new Date(dayStart);\n\n  while (slotStart < dayEnd) {\n    const slotEnd = new Date(slotStart.getTime() + SLOT_MINUTES * 60000);\n\n    if (slotEnd > dayEnd) break;\n\n    // This now correctly references the busySlots mapped above\n    const isBusy = busySlots.some(busy =>\n      overlaps(slotStart, slotEnd, busy.start, busy.end)\n    );\n\n    if (!isBusy && slotStart > now && slotStart >= rangeStart) {\n      slots.push(slotStart.toISOString());\n    }\n\n    slotStart = slotEnd;\n  }\n\n  if (slots.length > 0) {\n    results.push({\n      date: cursor.toISOString().substring(0, 10),\n      slots,\n    });\n  }\n\n  cursor.setUTCDate(cursor.getUTCDate() + 1);\n}\n\nreturn results.map(r => ({ json: r }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        80
+      ],
+      "id": "7cb946e1-b844-413c-bd23-1d545d087b66",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "sendTo": "smplics.com@gmail.com",
+        "subject": "={{ $('Code in JavaScript').item.json.adminSubject }}",
+        "message": "={{ $('Code in JavaScript').item.json.adminBody }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1600,
+        304
+      ],
+      "id": "a613640f-9c6a-42d6-b31f-bd0533a30794",
+      "name": "Send a message1",
+      "webhookId": "85cc06f5-d571-4b71-a7c0-ada9195241e1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "34UMxMY3tebVxaVO",
+          "name": "gmail credentials (smplics)"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "connection": "close",
+            "host": "n8n.urbatech.io",
+            "x-real-ip": "10.0.0.2",
+            "x-forwarded-proto": "https",
+            "x-forwarded-host": "n8n.urbatech.io",
+            "x-forwarded-for": "31.14.252.5, 10.0.0.2",
+            "content-length": "79",
+            "cf-ray": "9c82485ae45fc9cd-OTP",
+            "cf-ipcountry": "RO",
+            "accept-encoding": "gzip, br",
+            "sec-fetch-site": "cross-site",
+            "sec-fetch-mode": "cors",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "sec-fetch-dest": "empty",
+            "sec-ch-ua-platform": "\"Linux\"",
+            "cf-worker": "urbatech.io",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua": "\"Chromium\";v=\"142\", \"Google Chrome\";v=\"142\", \"Not_A Brand\";v=\"99\"",
+            "content-type": "application/json",
+            "cf-ew-via": "15",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "accept-language": "en-US,en;q=0.9",
+            "accept": "*/*",
+            "referer": "http://localhost:8080/",
+            "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+            "cf-connecting-ip": "31.14.252.5",
+            "origin": "http://localhost:8080",
+            "priority": "u=1, i"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "rangeStart": "2026-02-28T21:00:00.000Z",
+            "rangeEnd": "2026-04-01T20:59:59.999Z"
+          },
+          "webhookUrl": "https://n8n.urbatech.io/webhook/af542988-8bae-4b5e-add3-786846ec8547",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Webhook1": [
+      {
+        "json": {
+          "headers": {
+            "connection": "close",
+            "host": "n8n.urbatech.io",
+            "x-real-ip": "10.0.0.2",
+            "x-forwarded-proto": "https",
+            "x-forwarded-host": "n8n.urbatech.io",
+            "x-forwarded-for": "31.14.252.4, 10.0.0.2",
+            "content-length": "369",
+            "cf-ray": "9c84b8727455e429-OTP",
+            "cf-ipcountry": "RO",
+            "accept-encoding": "gzip, br",
+            "sec-fetch-site": "cross-site",
+            "sec-fetch-mode": "cors",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "sec-fetch-dest": "empty",
+            "sec-ch-ua-platform": "\"Linux\"",
+            "cf-worker": "urbatech.io",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua": "\"Chromium\";v=\"142\", \"Google Chrome\";v=\"142\", \"Not_A Brand\";v=\"99\"",
+            "content-type": "application/json",
+            "cf-ew-via": "15",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "accept-language": "en-US,en;q=0.9,ar;q=0.8",
+            "accept": "*/*",
+            "referer": "http://localhost:8080/",
+            "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+            "cf-connecting-ip": "31.14.252.4",
+            "origin": "http://localhost:8080",
+            "priority": "u=1, i"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "name": "Mohammed Saleh",
+            "email": "mohammedsaleh1999ms@gmail.com",
+            "phone": "0932860612",
+            "businessName": "business1",
+            "service": "google-ads",
+            "date": "2026-02-07T20:36:10.521Z",
+            "time": "2026-02-07T09:30:00.000Z",
+            "message": "ش سيبسيب يسب",
+            "selectedSlot": "2026-02-07T09:30:00.000Z",
+            "bookedAt": "2026-02-03T20:36:26.141Z",
+            "timezone": "Asia/Damascus",
+            "paymentMethod": "cash"
+          },
+          "webhookUrl": "https://n8n.urbatech.io/webhook/3b7be704-f82c-4eb8-b6d8-f96fc41a7b9d",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Get availability in a calendar": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Get availability in a calendar1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get availability in a calendar1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Create an event1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get availability in a calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "set data coming from the client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "set data coming from the client": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "93ad4f4e-4afd-45dc-a242-700357c184e7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a03d74449f09a0d103b11c0ee46ee8046d10d7cc69888a9d6870ac5124d16587"
+  },
+  "id": "BobGorSq7xCibvJ6DWXsB",
+  "tags": []
+}
